@@ -4,6 +4,6 @@ export default defineConfig({
 plugins: [react()],
 base: '/MADHACKS-25/',
 build: {
-outDir: 'docs'
+outDir: '../docs'
 }
 })
