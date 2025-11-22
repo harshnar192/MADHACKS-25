@@ -1,0 +1,334 @@
+/* Minimalist Top Nav - Google-like */
+.top-nav-menu {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 0;
+  box-shadow: none;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.app-brand {
+  color: var(--text-primary) !important;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.app-brand:hover {
+  color: var(--text-primary) !important;
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.app-brand.active {
+  opacity: 1;
+}
+
+.brand-icon {
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.main-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-link-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-link-custom:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link-custom.active {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 500;
+}
+
+.nav-link-custom.active::after {
+  display: none;
+}
+
+.nav-icon {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.nav-label {
+  font-size: 14px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* Settings Dropdown Toggle */
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-icon {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.settings-label {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  opacity: 0.6;
+  margin-left: 2px;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown-custom.show .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-custom .dropdown-toggle {
+  color: var(--text-primary);
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.nav-dropdown-custom .dropdown-toggle:hover,
+.nav-dropdown-custom .dropdown-toggle:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.nav-dropdown-custom .dropdown-toggle::after {
+  display: none;
+}
+
+/* Dropdown Menu */
+.nav-dropdown-custom .dropdown-menu {
+  background-color: var(--bg-card);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 8px;
+  padding: 8px 0;
+  min-width: 200px;
+}
+
+/* Dropdown Items */
+.settings-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px !important;
+  color: var(--text-primary) !important;
+  font-size: 14px;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+.settings-dropdown-item:hover,
+.settings-dropdown-item:focus {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-primary) !important;
+}
+
+.dropdown-item-icon {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.dropdown-item-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Divider */
+.nav-dropdown-custom .dropdown-divider {
+  border-color: var(--border-subtle);
+  margin: 4px 0;
+  opacity: 1;
+}
+
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+}
+
+.user-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Auth Navigation Links */
+.auth-nav-link {
+  margin-right: 8px;
+}
+
+.auth-nav-button {
+  padding: 8px 20px !important;
+  font-size: 14px !important;
+  border-radius: 20px !important;
+  text-decoration: none;
+  margin-left: 8px;
+}
+
+.auth-nav-button:hover {
+  text-decoration: none;
+}
+
+/* Guest-specific styling */
+.app-brand[style*="pointer"] {
+  transition: opacity 0.2s ease;
+}
+
+.app-brand[style*="pointer"]:hover {
+  opacity: 0.8;
+}
+
+/* Logout Item */
+.logout-item {
+  color: #f28b82 !important;
+}
+
+.logout-item:hover {
+  background-color: rgba(242, 139, 130, 0.1) !important;
+  color: #f28b82 !important;
+}
+
+/* Navbar Toggle (Hamburger) */
+.navbar-toggle-custom {
+  border: none;
+  padding: 4px 8px;
+}
+
+.navbar-toggle-custom:focus {
+  box-shadow: none;
+}
+
+.navbar-toggle-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(232, 234, 237, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .main-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    width: 100%;
+  }
+  
+  .nav-link-custom {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .nav-dropdown-custom {
+    width: 100%;
+  }
+
+  .nav-dropdown-custom .dropdown-toggle {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 10px 16px;
+  }
+
+  .nav-dropdown-custom .dropdown-menu {
+    width: 100%;
+    position: static !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-container {
+    padding: 0 16px;
+  }
+  
+  .top-nav-menu {
+    padding: 12px 0;
+  }
+  
+  .app-brand {
+    font-size: 20px;
+  }
+  
+  .brand-icon {
+    font-size: 20px;
+  }
+
+  .settings-icon {
+    font-size: 16px;
+  }
+
+  .settings-label {
+    font-size: 13px;
+  }
+}

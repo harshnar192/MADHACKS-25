@@ -1,0 +1,257 @@
+/* App Description Modal - Google-like Minimalist */
+.app-description-modal .modal-content {
+  background-color: var(--bg-card);
+  border: none;
+  border-radius: 12px;
+  color: var(--text-primary);
+  max-width: 700px;
+}
+
+.modal-header-custom {
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: transparent;
+  padding: 32px 32px 24px 32px;
+}
+
+.modal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.app-icon-large {
+  font-size: 56px;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.modal-title-text {
+  color: var(--text-primary);
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px 0;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.modal-header-custom .btn-close {
+  filter: invert(1);
+  opacity: 0.6;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.modal-header-custom .btn-close:hover {
+  opacity: 1;
+}
+
+.modal-body-custom {
+  padding: 32px;
+}
+
+.app-description-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.description-intro {
+  text-align: left;
+}
+
+.intro-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  transition: background-color 0.2s ease;
+}
+
+.feature-card:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.feature-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.feature-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: 0;
+}
+
+.feature-description {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  letter-spacing: 0;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.step-content p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+  font-weight: 400;
+}
+
+.modal-footer-custom {
+  border-top: 1px solid var(--border-subtle);
+  background-color: transparent;
+  padding: 20px 32px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.modal-footer-custom .btn {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .app-description-modal .modal-content {
+    margin: 16px;
+    max-width: calc(100% - 32px);
+  }
+
+  .modal-header-custom {
+    padding: 24px 24px 20px 24px;
+  }
+
+  .modal-body-custom {
+    padding: 24px;
+  }
+
+  .modal-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .app-icon-large {
+    font-size: 48px;
+  }
+
+  .modal-title-text {
+    font-size: 24px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 16px;
+  }
+
+  .modal-footer-custom {
+    flex-direction: column-reverse;
+    padding: 16px 24px;
+  }
+
+  .modal-footer-custom .btn {
+    width: 100%;
+  }
+
+  .intro-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}

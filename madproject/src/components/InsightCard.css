@@ -1,0 +1,41 @@
+/* Minimalist Insight Card */
+.insight-card {
+  margin-bottom: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.insight-card-title {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  letter-spacing: 0;
+}
+
+.insight-card-subtitle {
+  font-size: 13px;
+  margin: 0 0 20px 0;
+  font-weight: 400;
+}
+
+.insight-card-content {
+  color: var(--text-primary);
+}
+
+/* Remove accent borders for minimalism */
+.insight-card.accent-primary,
+.insight-card.accent-success,
+.insight-card.accent-danger {
+  border-left: none;
+}
+
+.insight-card.accent-primary:hover,
+.insight-card.accent-success:hover,
+.insight-card.accent-danger:hover {
+  border-left: none;
+}
