@@ -1,0 +1,109 @@
+{
+  "user_id": "user_001",
+  "voice_entries": [
+    {
+      "id": "entry_001",
+      "transaction_id": "tx_001",
+      "raw_transcript": "Just ordered Uber Eats again, like 47 bucks. Long day at work, didn't have energy to cook. Feeling kinda guilty about it.",
+      "parsed": {
+        "amount": 47,
+        "amount_confidence": "estimated",
+        "category": "food_delivery",
+        "emotion": "guilt",
+        "context": "exhausted after work"
+      },
+      "timestamp": "2025-01-20T20:45:00"
+    },
+    {
+      "id": "entry_002",
+      "transaction_id": "tx_004",
+      "raw_transcript": "DoorDash again, fifty something dollars. Had a super stressful day, boss was on my case. Just needed comfort food.",
+      "parsed": {
+        "amount": 50,
+        "amount_confidence": "estimated",
+        "category": "food_delivery",
+        "emotion": "stressed",
+        "context": "stressful work day, needed comfort"
+      },
+      "timestamp": "2025-01-21T20:00:00"
+    },
+    {
+      "id": "entry_003",
+      "transaction_id": "tx_006",
+      "raw_transcript": "Went out with coworkers after work. Spent like 85 dollars at the bar. Couldn't really say no, everyone was going. Feel weird about it.",
+      "parsed": {
+        "amount": 85,
+        "amount_confidence": "exact",
+        "category": "alcohol",
+        "emotion": "regret",
+        "context": "peer pressure from coworkers"
+      },
+      "timestamp": "2025-01-21T23:30:00"
+    },
+    {
+      "id": "entry_004",
+      "transaction_id": "tx_007",
+      "raw_transcript": "Target run, spent way more than I planned. Like 150 something. Went in for toothpaste, came out with... I don't even know. Total impulse shopping.",
+      "parsed": {
+        "amount": 150,
+        "amount_confidence": "estimated",
+        "category": "shopping",
+        "emotion": "impulsive",
+        "context": "impulse shopping, unplanned purchases"
+      },
+      "timestamp": "2025-01-22T16:00:00"
+    },
+    {
+      "id": "entry_005",
+      "transaction_id": "tx_013",
+      "raw_transcript": "Did groceries at Whole Foods. About 87 dollars. Actually feeling good about this one, gonna meal prep this weekend.",
+      "parsed": {
+        "amount": 87,
+        "amount_confidence": "exact",
+        "category": "groceries",
+        "emotion": "positive",
+        "context": "meal prep planned, responsible purchase"
+      },
+      "timestamp": "2025-01-24T12:00:00"
+    },
+    {
+      "id": "entry_006",
+      "transaction_id": "tx_014",
+      "raw_transcript": "Happy hour with the team, 62 dollars. It's Friday so I guess it's okay? But that's two bar nights this week already.",
+      "parsed": {
+        "amount": 62,
+        "amount_confidence": "exact",
+        "category": "alcohol",
+        "emotion": "justified",
+        "context": "Friday treat, but aware of pattern"
+      },
+      "timestamp": "2025-01-24T20:00:00"
+    },
+    {
+      "id": "entry_007",
+      "transaction_id": "tx_016",
+      "raw_transcript": "Saturday night Grubhub. 41 dollars. Was supposed to cook with those groceries but honestly just too tired. Ugh.",
+      "parsed": {
+        "amount": 41,
+        "amount_confidence": "exact",
+        "category": "food_delivery",
+        "emotion": "self-critical",
+        "context": "didn't cook as planned, disappointed in self"
+      },
+      "timestamp": "2025-01-25T21:00:00"
+    },
+    {
+      "id": "entry_008",
+      "transaction_id": "tx_019",
+      "raw_transcript": "Sunday night drinks, 78 bucks. Third time at a bar this week. This is becoming a problem honestly.",
+      "parsed": {
+        "amount": 78,
+        "amount_confidence": "exact",
+        "category": "alcohol",
+        "emotion": "anxious",
+        "context": "recognizing problematic pattern"
+      },
+      "timestamp": "2025-01-26T22:00:00"
+    }
+  ]
+}
