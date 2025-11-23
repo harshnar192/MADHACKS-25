@@ -1,0 +1,164 @@
+.transactions-page {
+  min-height: 100vh;
+  padding-bottom: 80px; /* Space for bottom nav */
+}
+
+.transactions-page .page-header {
+  margin-bottom: 2rem;
+}
+
+.transactions-page .page-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.transactions-container {
+  background-color: var(--bg-secondary, #1e1e1e);
+  border-radius: 12px;
+  padding: 0;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-group {
+  margin-bottom: 2rem;
+}
+
+.transaction-group:last-child {
+  margin-bottom: 0;
+}
+
+.transaction-date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.date-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-primary, #4a9eff);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.date-count {
+  font-size: 12px;
+  color: var(--text-secondary, #888);
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: var(--bg-card, #252525);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.transaction-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon {
+  font-size: 24px;
+}
+
+.transaction-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-merchant {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-details {
+  font-size: 13px;
+  color: var(--text-secondary, #888);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.transaction-category {
+  text-transform: capitalize;
+}
+
+.transaction-day {
+  color: var(--text-secondary, #666);
+}
+
+.transaction-amount {
+  flex-shrink: 0;
+  margin-left: 16px;
+  text-align: right;
+}
+
+.amount-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+}
+
+.amount-value.positive {
+  color: var(--accent-success, #4caf50);
+}
+
+.amount-value.negative {
+  color: var(--accent-danger, #f44336);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary, #888);
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+}
+

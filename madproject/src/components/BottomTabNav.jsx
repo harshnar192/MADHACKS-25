@@ -8,6 +8,7 @@ function BottomTabNav() {
     { path: '/summary', label: 'Summary', icon: '📋' },
     { path: '/voice', label: 'Voice', icon: '🎤' },
     { path: '/goals', label: 'Goals', icon: '🎯' },
+    { path: '/transactions', label: 'Transactions', icon: '💳' },
   ];
 
   return (
