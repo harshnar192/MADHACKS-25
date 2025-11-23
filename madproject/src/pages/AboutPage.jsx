@@ -149,7 +149,7 @@ function AboutPage() {
                   <button className="btn-primary-custom">Get Started</button>
                 </Link>
                 <Link to="/login">
-                  <button className="btn-secondary-custom">Sign In</button>
+                  <button className="btn-secondary-custom">Login</button>
                 </Link>
               </div>
             </div>

@@ -1,13 +1,41 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Container, Modal, Form, Button } from 'react-bootstrap';
 import GoalProgressCard from '../components/GoalProgressCard';
 import InsightCard from '../components/InsightCard';
-import { monthlyGoal, emotionalBlockers, blockerNote } from '../mockData';
+import { useData } from '../contexts/DataContext';
+import { monthlyGoal } from '../mockData';
 import './GoalsPage.css';
 
 function GoalsPage() {
+  const { checkIns } = useData();
   const [showGuardrailModal, setShowGuardrailModal] = useState(false);
   const [showGoalModal, setShowGoalModal] = useState(false);
+
+  // Calculate emotional blockers from check-ins
+  const emotionalBlockers = useMemo(() => {
+    const blockers = {};
+    checkIns.forEach(checkIn => {
+      const note = (checkIn.note || '').toLowerCase();
+      if (note.includes('deserved') || note.includes('deserve')) {
+        blockers['I deserved it'] = (blockers['I deserved it'] || 0) + 1;
+      }
+      if (note.includes('tired') || note.includes('too tired')) {
+        blockers['Too tired to cook'] = (blockers['Too tired to cook'] || 0) + 1;
+      }
+      if (note.includes('just this once') || note.includes('one time')) {
+        blockers['Just this once'] = (blockers['Just this once'] || 0) + 1;
+      }
+    });
+
+    return Object.entries(blockers).map(([phrase, count]) => ({
+      phrase,
+      count
+    })).sort((a, b) => b.count - a.count);
+  }, [checkIns]);
+
+  const blockerNote = emotionalBlockers.length > 0
+    ? "These patterns currently block your savings goal."
+    : "No emotional blockers detected yet. Keep tracking to identify patterns.";
 
   // TODO: Implement guardrail functionality when backend is integrated
   const handleGuardrailModalClose = () => setShowGuardrailModal(false);

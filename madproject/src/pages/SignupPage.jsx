@@ -146,7 +146,7 @@ function SignupPage() {
             <p className="muted-text">
               Already have an account?{' '}
               <Link to="/login" className="auth-link">
-                Sign in
+                Login
               </Link>
             </p>
           </div>

@@ -3,16 +3,14 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import WidgetCard from '../components/WidgetCard';
 import EmotionTag from '../components/EmotionTag';
+import EmotionPieChart from '../components/EmotionPieChart';
 import TransactionList from '../components/TransactionList';
-import { 
-  emotionalSpending, 
-  emotionBreakdown, 
-  invisibleSpending 
-} from '../mockData';
+import { useData } from '../contexts/DataContext';
 import './InsightsPage.css';
 
 function InsightsPage() {
   const navigate = useNavigate();
+  const { emotionalSpending, emotionBreakdown, invisibleSpending } = useData();
   const [selectedEmotion, setSelectedEmotion] = useState(null);
 
   const handleEmotionClick = (emotion) => {
@@ -45,6 +43,12 @@ function InsightsPage() {
             >
               <div className="emotional-spending-content">
                 <div className="spending-amount number-display">${emotionalSpending}</div>
+                
+                {/* Pie Chart */}
+                <div className="pie-chart-wrapper">
+                  <EmotionPieChart data={emotionBreakdown} />
+                </div>
+                
                 <div className="emotion-tags-row">
                   {emotionBreakdown.map((emotion, index) => (
                     <div
