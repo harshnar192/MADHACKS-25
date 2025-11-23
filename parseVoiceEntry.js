@@ -1,5 +1,6 @@
-const Anthropic = require("@anthropic-ai/sdk").default;
-require("dotenv").config();
+import Anthropic from "@anthropic-ai/sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
 const client = new Anthropic();
 
@@ -34,20 +35,22 @@ async function parseEntry(transcript) {
   return JSON.parse(text);
 }
 
-// Test it
-async function test() {
-  const testCases = [
-    "Just ordered Uber Eats again, like 47 bucks. Long day, feeling guilty.",
-    "Spent way too much at Target but I needed everything",
-    "Coffee, 6 dollars. My little treat before work, totally worth it.",
-    "Went out with coworkers, probably dropped 80 at the bar. Couldn't say no.",
-  ];
+export { parseEntry };
 
-  for (const transcript of testCases) {
-    console.log("\n--- INPUT:", transcript);
-    const result = await parseEntry(transcript);
-    console.log("OUTPUT:", JSON.stringify(result, null, 2));
-  }
-}
-
-test();
+// Uncomment to test:
+// async function test() {
+//   const testCases = [
+//     "Just ordered Uber Eats again, like 47 bucks. Long day, feeling guilty.",
+//     "Spent way too much at Target but I needed everything",
+//     "Coffee, 6 dollars. My little treat before work, totally worth it.",
+//     "Went out with coworkers, probably dropped 80 at the bar. Couldn't say no.",
+//   ];
+//
+//   for (const transcript of testCases) {
+//     console.log("\n--- INPUT:", transcript);
+//     const result = await parseEntry(transcript);
+//     console.log("OUTPUT:", JSON.stringify(result, null, 2));
+//   }
+// }
+//
+// test();

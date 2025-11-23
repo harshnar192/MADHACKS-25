@@ -1,5 +1,6 @@
-const Anthropic = require("@anthropic-ai/sdk").default;
-require("dotenv").config();
+import Anthropic from "@anthropic-ai/sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
 const client = new Anthropic();
 
@@ -95,7 +96,7 @@ async function generateSummary(persona, data) {
   return response.content[0].text;
 }
 
-// TEST
+/*// TEST
 async function test() {
   // Using mock data structure
   const data = {
@@ -144,4 +145,6 @@ async function test() {
   }
 }
 
-test();
+test(); */
+
+export { generateSummary };

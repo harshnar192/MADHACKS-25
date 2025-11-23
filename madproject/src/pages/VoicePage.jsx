@@ -1,37 +1,78 @@
 import { useState } from 'react';
-import { Container, Form, Button, InputGroup } from 'react-bootstrap';
+import { Container, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import VoiceBubble from '../components/VoiceBubble';
 import { initialMessages } from '../mockData';
+import { parseEntry } from '../services/api';
 import './VoicePage.css';
 
 function VoicePage() {
   const [messages, setMessages] = useState(initialMessages);
   const [inputText, setInputText] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // TODO: Implement voice recording functionality when backend is ready
   const handleVoiceRecord = () => {
-    alert('Voice recording coming soon! This will integrate with speech-to-text API.');
+    // Voice recording functionality - to be implemented with Web Speech API
+    alert('Voice recording feature coming soon! For now, please type your message.');
   };
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || isProcessing) return;
 
-    // Add user message
+    const userInput = inputText.trim();
+    
+    // Add user message immediately
     const newUserMessage = {
       from: 'user',
-      text: inputText.trim()
+      text: userInput
     };
-
-    // TODO: Replace with real AI assistant response when backend is integrated
-    // For now, add a placeholder assistant response
-    const assistantResponse = {
-      from: 'assistant',
-      text: "I understand your question. This is a placeholder response. In the full version, this will use AI to analyze your spending patterns and provide personalized advice."
-    };
-
-    setMessages(prev => [...prev, newUserMessage, assistantResponse]);
+    setMessages(prev => [...prev, newUserMessage]);
     setInputText('');
+    setIsProcessing(true);
+
+    try {
+      // Parse the user's message using the backend
+      const parsedResult = await parseEntry(userInput);
+      
+      // Generate a contextual response based on the parsed data
+      let responseText = "I've analyzed your entry. ";
+      
+      if (parsedResult.amount) {
+        responseText += `I see you mentioned spending $${parsedResult.amount}. `;
+      }
+      
+      if (parsedResult.category) {
+        responseText += `This appears to be a ${parsedResult.category.replace('_', ' ')} expense. `;
+      }
+      
+      if (parsedResult.emotion && parsedResult.emotion !== 'neutral') {
+        responseText += `I noticed you're feeling ${parsedResult.emotion} about this purchase. `;
+      }
+      
+      if (parsedResult.needs_followup) {
+        responseText += "Would you like to tell me more about what led to this decision?";
+      } else {
+        responseText += "Thanks for sharing this with me. I'm tracking your patterns to help you understand your spending better.";
+      }
+
+      const assistantResponse = {
+        from: 'assistant',
+        text: responseText
+      };
+
+      setMessages(prev => [...prev, assistantResponse]);
+    } catch (error) {
+      console.error('Failed to process message:', error);
+      
+      // Fallback response on error
+      const errorResponse = {
+        from: 'assistant',
+        text: "I'm having trouble connecting to the backend service right now. Your message has been noted, but I can't provide detailed analysis at the moment. Please try again later."
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -75,9 +116,16 @@ function VoicePage() {
               <Button
                 type="submit"
                 className="btn-primary-custom voice-send-btn"
-                disabled={!inputText.trim()}
+                disabled={!inputText.trim() || isProcessing}
               >
-                Send
+                {isProcessing ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Processing...
+                  </>
+                ) : (
+                  'Send'
+                )}
               </Button>
             </InputGroup>
           </Form>

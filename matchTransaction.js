@@ -1,5 +1,6 @@
-const Anthropic = require("@anthropic-ai/sdk").default;
-require("dotenv").config();
+import Anthropic from "@anthropic-ai/sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
 const client = new Anthropic();
 
@@ -50,7 +51,7 @@ async function matchTransaction(parsedEntry, transcript, entryTime, transactions
   return JSON.parse(text);
 }
 
-// TEST
+/*// TEST
 async function test() {
   // Sample bank transactions (from mock data)
   const transactions = [
@@ -77,4 +78,5 @@ async function test() {
   console.log("Result:", JSON.stringify(result, null, 2));
 }
 
-test();
+test(); */
+export { matchTransaction };
