@@ -5,17 +5,55 @@ import { FishAudioClient } from "fish-audio";
 import { spawn } from "child_process";
 import ffmpegPath from "ffmpeg-static";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 dotenv.config();
 
 import { parseEntry } from "./parseVoiceEntry.js";
 import { generateSummary } from "./generateSummary.js";
 import { matchTransaction } from "./matchTransaction.js";
-import { readFileSync } from "fs";
 
 const fishAudio = new FishAudioClient({ apiKey: process.env.FISH_API_KEY });
 const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
+
+// JWT Secret (in production, use a strong secret from env)
+const JWT_SECRET = process.env.JWT_SECRET || 'madhacks-secret-key-change-in-production';
+const JWT_EXPIRY = '7d'; // Token expires in 7 days
+
+// Simple in-memory user storage (in production, use a database)
+const USERS_FILE = './files/users.json';
+
+// Load users from file or create empty array
+function loadUsers() {
+  if (existsSync(USERS_FILE)) {
+    try {
+      return JSON.parse(readFileSync(USERS_FILE, 'utf-8'));
+    } catch (error) {
+      console.error('Error loading users:', error);
+      return [];
+    }
+  }
+  return [];
+}
+
+// Save users to file
+function saveUsers(users) {
+  try {
+    writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.error('Error saving users:', error);
+  }
+}
+
+// Initialize users file if it doesn't exist
+if (!existsSync(USERS_FILE)) {
+  saveUsers([]);
+}
+
+let users = loadUsers();
 
 // Enhanced CORS configuration to allow frontend on port 5173 (Vite default)
 app.use(cors({
@@ -32,6 +70,23 @@ app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
+
+// JWT Verification Middleware
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1]; // Bearer <token>
+  
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
 
 // Helper function to convert webm to mp3
 function webmToMp3(buffer) {
@@ -188,6 +243,141 @@ app.get("/api/transactions", (req, res) => {
   }
 });
 
+// Authentication endpoints
+app.post("/api/auth/signup", async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password || !name) {
+      return res.status(400).json({ 
+        error: "Email, password, and name are required" 
+      });
+    }
+
+    // Check if user already exists
+    users = loadUsers();
+    const existingUser = users.find(u => u.email === email);
+    if (existingUser) {
+      return res.status(400).json({ 
+        error: "User with this email already exists" 
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const newUser = {
+      id: Date.now().toString(),
+      email,
+      name,
+      password: hashedPassword,
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: newUser.id, email: newUser.email },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name
+      }
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create account',
+      message: error.message 
+    });
+  }
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ 
+        error: "Email and password are required" 
+      });
+    }
+
+    // Find user
+    users = loadUsers();
+    const user = users.find(u => u.email === email);
+    
+    if (!user) {
+      return res.status(401).json({ 
+        error: "Invalid email or password" 
+      });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ 
+        error: "Invalid email or password" 
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRY }
+    );
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      error: 'Failed to login',
+      message: error.message 
+    });
+  }
+});
+
+app.get("/api/auth/verify", verifyToken, (req, res) => {
+  // If we get here, token is valid
+  users = loadUsers();
+  const user = users.find(u => u.id === req.user.userId);
+  
+  if (!user) {
+    return res.status(404).json({ 
+      error: "User not found" 
+    });
+  }
+
+  res.json({
+    success: true,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name
+    }
+  });
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ 
@@ -201,7 +391,7 @@ app.get("/health", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Endpoint not found',
-    availableEndpoints: ['/health', '/api/transactions', '/parse-entry', '/match-transaction', '/generate-summary', '/api/transcribe']
+    availableEndpoints: ['/health', '/api/auth/login', '/api/auth/signup', '/api/auth/verify', '/api/transactions', '/api/impulsive', '/api/monthly', '/parse-entry', '/match-transaction', '/generate-summary', '/api/transcribe']
   });
 });
 

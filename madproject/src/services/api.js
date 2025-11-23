@@ -1,6 +1,32 @@
 // API service for backend communication
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+// Token management
+const TOKEN_KEY = 'madhacks_auth_token';
+const USER_KEY = 'madhacks_user';
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function removeToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function getUser() {
+  const userStr = localStorage.getItem(USER_KEY);
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+export function setUser(user) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
 /**
  * Parse a voice entry transcript using the backend AI
  * @param {string} transcript - The voice transcript to parse
