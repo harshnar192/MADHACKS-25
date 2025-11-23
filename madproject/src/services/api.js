@@ -381,22 +381,17 @@ export async function verifyToken() {
 }
 
 /**
- * Get impulsive purchases from impulsive.json
- * @param {string} userId - User ID (not used, kept for compatibility)
+ * Get impulsive purchases (uses emotional transactions for now)
+ * @param {string} userId - User ID
  * @returns {Promise<Object>} Impulsive purchases data
  */
 export async function getImpulsivePurchases(userId = 'default') {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/impulsive`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch impulsive purchases: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    // For now, return emotional transactions as impulsive purchases
+    const response = await getEmotionalTransactions(userId, 100);
     return {
-      transactions: data.transactions || [],
-      total: data.transactions?.length || 0
+      transactions: response.transactions || [],
+      total: response.transactions?.length || 0
     };
   } catch (error) {
     console.error('Error fetching impulsive purchases:', error);

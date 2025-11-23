@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { getEmotionalTransactions, getBankTransactions, getImpulsivePurchases } from '../services/api';
+import { getEmotionalTransactions, getBankTransactions } from '../services/api';
 
 const DataContext = createContext();
 
@@ -39,40 +39,32 @@ export function DataProvider({ children }) {
   // Fetch from MongoDB instead of localStorage
   const [checkIns, setCheckIns] = useState([]);
   const [bankTransactions, setBankTransactions] = useState([]);
-  const [impulsivePurchases, setImpulsivePurchases] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch emotional transactions, bank transactions, and impulsive purchases on mount
+  // Fetch emotional transactions and bank transactions on mount
   useEffect(() => {
-    let isMounted = true;
-
     async function loadData() {
       try {
         setIsLoading(true);
-        console.log('🔄 Loading emotional transactions, bank data, and impulsive purchases...');
+        console.log('🔄 Loading emotional transactions and bank data...');
         
-        // Fetch all data in parallel
-        const [emotionalResponse, bankResponse, impulsiveResponse] = await Promise.all([
-          getEmotionalTransactions('default', 100).catch(err => {
-            console.warn('⚠️ Failed to fetch emotional transactions:', err);
-            return { transactions: [] };
-          }),
-          getBankTransactions().catch(err => {
-            console.warn('⚠️ Failed to fetch bank transactions:', err);
-            return { transactions: [] };
-          }),
-          getImpulsivePurchases('default').catch(err => {
-            console.warn('⚠️ Failed to fetch impulsive purchases:', err);
-            return { transactions: [] };
-          })
+        // Fetch both emotional transactions and bank transactions in parallel
+        const [emotionalResponse, bankResponse] = await Promise.all([
+          getEmotionalTransactions('default', 100),
+          getBankTransactions()
         ]);
         
-        if (!isMounted) return;
-
         console.log('✅ Received emotional transactions:', emotionalResponse);
         console.log('✅ Received bank transactions:', bankResponse);
-        console.log('✅ Received impulsive purchases:', impulsiveResponse);
+        
+        if (!emotionalResponse || !emotionalResponse.transactions) {
+          console.warn('⚠️ No emotional transactions in response:', emotionalResponse);
+        }
+        
+        if (!bankResponse || !bankResponse.transactions) {
+          console.warn('⚠️ No bank transactions in response:', bankResponse);
+        }
         
         // Transform MongoDB documents to the format expected by UI
         const transformedData = (emotionalResponse.transactions || []).map(tx => ({
@@ -82,67 +74,55 @@ export function DataProvider({ children }) {
           amount: `$${Number(tx.amount || 0).toFixed(2)}`,
           note: tx.context || tx.transcript || '',
           icon: getIconForMerchant(tx.merchant || '', tx.category || ''),
-        amountType: 'negative',
+          amountType: 'negative',
           emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
           amountValue: Number(tx.amount || 0),
           timestamp: tx.entry_time
         }));
 
         console.log(`✅ Transformed ${transformedData.length} emotional transactions`);
+        console.log('Sample transformed data:', transformedData.slice(0, 2));
         setCheckIns(transformedData);
         
         // Store bank transactions
         const bankTxns = bankResponse.transactions || [];
         setBankTransactions(bankTxns);
         console.log(`✅ Loaded ${bankTxns.length} bank transactions`);
-
-        // Store impulsive purchases (from impulsive.json)
-        const impulsiveTxns = impulsiveResponse.transactions || [];
-        setImpulsivePurchases(impulsiveTxns);
-        console.log(`✅ Loaded ${impulsiveTxns.length} impulsive purchases`);
         
         setError(null);
         console.log('✅ Data loading complete!');
       } catch (err) {
-        if (!isMounted) return;
         console.error('❌ Failed to load data:', err);
         console.error('Error stack:', err.stack);
         setError(err.message);
         setCheckIns([]);
         setBankTransactions([]);
-        setImpulsivePurchases([]);
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-          console.log('🔚 Loading state set to false');
-        }
+        setIsLoading(false);
+        console.log('🔚 Loading state set to false');
       }
     }
 
     loadData();
-
-    return () => {
-      isMounted = false;
-    };
   }, []); // Load once on mount
 
-  // Calculate mood breakdown from impulsive purchases - based on FREQUENCY (count)
+  // Calculate mood breakdown from check-ins - based on FREQUENCY (count)
   const moodBreakdown = useMemo(() => {
-    if (impulsivePurchases.length === 0) {
+    if (checkIns.length === 0) {
       return [];
     }
 
     const moodCounts = {};
     const moodAmounts = {};
     
-    // Process ALL transactions from impulsivePurchases
-    impulsivePurchases.forEach(tx => {
-      const mood = (tx.mood || 'neutral').toLowerCase();
+    // Process ALL transactions from checkIns
+    checkIns.forEach(tx => {
+      const mood = (tx.emotion || 'neutral').toLowerCase();
       moodCounts[mood] = (moodCounts[mood] || 0) + 1;
-      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amount || 0);
+      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amountValue || 0);
     });
 
-    const totalCount = impulsivePurchases.length;
+    const totalCount = checkIns.length;
 
     // Calculate percentage based on FREQUENCY (count), not amount
     const breakdown = Object.keys(moodCounts).map(mood => ({
@@ -153,7 +133,7 @@ export function DataProvider({ children }) {
     })).sort((a, b) => b.count - a.count); // Sort by count, not amount
     
     return breakdown;
-  }, [impulsivePurchases]);
+  }, [checkIns]);
 
   // Calculate emotional spending breakdown (legacy - from checkIns)
   const emotionBreakdown = useMemo(() => {
@@ -209,24 +189,25 @@ export function DataProvider({ children }) {
       .reduce((sum, tx) => sum + (tx.amount || 0), 0);
   }, [bankTransactions]);
 
-  // Calculate total emotional spending from impulsive purchases
+  // Calculate total emotional spending (excluding income)
   const emotionalSpending = useMemo(() => {
-    return impulsivePurchases
-      .reduce((sum, tx) => sum + (tx.amount || 0), 0);
-  }, [impulsivePurchases]);
+    return checkIns
+      .filter(tx => tx.category !== 'income')
+      .reduce((sum, checkIn) => sum + (checkIn.amountValue || 0), 0);
+  }, [checkIns]);
 
-  // Calculate spending by mood (for bar chart) from impulsive purchases
+  // Calculate spending by mood (for bar chart)
   const spendingByMood = useMemo(() => {
-    if (impulsivePurchases.length === 0) {
+    if (checkIns.length === 0) {
       return [];
     }
 
     const moodAmounts = {};
     const moodCounts = {};
     
-    impulsivePurchases.forEach(tx => {
-      const mood = (tx.mood || 'neutral').toLowerCase();
-      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amount || 0);
+    checkIns.forEach(tx => {
+      const mood = (tx.emotion || 'neutral').toLowerCase();
+      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amountValue || 0);
       moodCounts[mood] = (moodCounts[mood] || 0) + 1;
     });
 
@@ -235,7 +216,7 @@ export function DataProvider({ children }) {
       amount: moodAmounts[mood],
       count: moodCounts[mood]
     })).sort((a, b) => b.amount - a.amount);
-  }, [impulsivePurchases]);
+  }, [checkIns]);
 
   // Calculate spending by category and mood
   const spendingByCategoryMood = useMemo(() => {
@@ -266,19 +247,19 @@ export function DataProvider({ children }) {
     return Object.values(categoryMoodMap).sort((a, b) => b.amount - a.amount);
   }, [checkIns]);
 
-  // Calculate invisible spending (small purchases) from impulsive purchases
+  // Calculate invisible spending (small purchases)
   const invisibleSpending = useMemo(() => {
-    return impulsivePurchases
-      .filter(tx => (tx.amount || 0) < 50)
+    return checkIns
+      .filter(checkIn => (checkIn.amountValue || 0) < 50)
       .slice(0, 3)
-      .map(tx => ({
-        label: tx.merchant || 'Unknown',
-        amount: `$${(tx.amount || 0).toFixed(2)}`,
-        note: tx.description || '',
-        icon: getIconForMerchant(tx.merchant || '', tx.category || ''),
+      .map(checkIn => ({
+        label: checkIn.label,
+        amount: checkIn.amount,
+        note: checkIn.note,
+        icon: checkIn.icon,
         amountType: 'negative'
       }));
-  }, [impulsivePurchases]);
+  }, [checkIns]);
 
   // Refresh data from MongoDB (call this after saving a new transaction)
   const refreshData = async () => {
@@ -296,12 +277,12 @@ export function DataProvider({ children }) {
         amount: `$${Number(tx.amount || 0).toFixed(2)}`,
         note: tx.context || tx.transcript || '',
         icon: getIconForMerchant(tx.merchant || '', tx.category || ''),
-      amountType: 'negative',
+        amountType: 'negative',
         emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
         amountValue: Number(tx.amount || 0),
         timestamp: tx.entry_time
       }));
-
+      
       setCheckIns(transformedData);
       setBankTransactions(bankResponse.transactions || []);
       console.log('✅ Data refreshed successfully');
@@ -336,9 +317,9 @@ export function DataProvider({ children }) {
         
         if (!categories[formattedCategory]) {
           categories[formattedCategory] = 0;
-      }
+        }
         categories[formattedCategory] += checkIn.amountValue || 0;
-    });
+      });
 
     const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
     return Object.entries(categories).map(([category, amount]) => ({
@@ -362,9 +343,9 @@ export function DataProvider({ children }) {
       .sort((a, b) => b.count - a.count);
   }, [checkIns]);
 
-  // Calculate weekly summary stats from impulsive purchases
+  // Calculate weekly summary stats from checkIns
   const weeklySummary = useMemo(() => {
-    if (impulsivePurchases.length === 0) {
+    if (checkIns.length === 0) {
       return {
         lateEveningPercentage: 0,
         topMoodTrigger: null,
@@ -372,14 +353,14 @@ export function DataProvider({ children }) {
       };
     }
 
-    // Calculate late evening purchases (8pm - 6am) from datetime
-    const lateEvening = impulsivePurchases.filter(tx => {
-      if (!tx.datetime && !tx.time) return false;
-      const date = new Date(tx.datetime || tx.date + 'T' + tx.time);
+    // Calculate late evening purchases (8pm - 6am) from timestamps
+    const lateEvening = checkIns.filter(tx => {
+      if (!tx.timestamp) return false;
+      const date = new Date(tx.timestamp);
       const hour = date.getHours();
       return hour >= 20 || hour <= 6;
     });
-    const lateEveningPercentage = Math.round((lateEvening.length / impulsivePurchases.length) * 100);
+    const lateEveningPercentage = Math.round((lateEvening.length / checkIns.length) * 100);
 
     // Get top mood trigger
     const topMood = moodBreakdown.length > 0 ? moodBreakdown[0] : null;
@@ -389,13 +370,7 @@ export function DataProvider({ children }) {
       topMoodTrigger: topMood?.mood || null,
       topMoodPercentage: topMood?.percentage || 0
     };
-  }, [impulsivePurchases, moodBreakdown]);
-
-  // Convenience properties for InsightsPage
-  const lateEveningPurchasesPercentage = weeklySummary.lateEveningPercentage;
-  const topMoodTriggerSummary = weeklySummary.topMoodTrigger 
-    ? `${weeklySummary.topMoodTrigger.charAt(0).toUpperCase() + weeklySummary.topMoodTrigger.slice(1).replace('_', ' ')}`
-    : null;
+  }, [checkIns, moodBreakdown]);
 
   const value = {
     checkIns,
@@ -414,9 +389,6 @@ export function DataProvider({ children }) {
     spendingByMood,
     spendingByCategoryMood,
     weeklySummary,
-    impulsivePurchases,
-    lateEveningPurchasesPercentage,
-    topMoodTriggerSummary,
     
     // Income tracking
     monthlyIncome
@@ -436,4 +408,3 @@ export function useData() {
   }
   return context;
 }
-
