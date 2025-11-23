@@ -21,3 +21,38 @@ Pulse's goal is simple: **Help users understand the heartbeat behind their finan
 *   **Fish Audio**: Processing text-to-speech scripts and speech-to-text audios. 
 ##### Frontend
 *   **React + Vite**: A simple beautiful frontend
+
+## How To Run
+
+First, create an .env file that contains the following: 
+```
+# .env
+ANTHROPIC_API_KEY="YOUR API KEY"
+
+PORT=3001
+VITE_API_URL=http://localhost:3001
+FISH_API_KEY="YOUR API KEY"
+
+MONGODB_URI="YOUR URL"
+
+```
+
+
+Then, open two terminals to run the frontend and the backend
+
+```{bash}
+# ./MADHACKS-25/madproject
+# Frontend
+pnpm install
+pnpm run dev
+# Should be localhost:5173
+```
+
+```{bash}
+# ./MADHACKS-25
+# Backend
+npm install
+npm start
+```
+
+Then access the website through localhost:5173
