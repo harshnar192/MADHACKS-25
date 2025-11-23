@@ -4,7 +4,7 @@ import InsightCard from '../components/InsightCard';
 import TransactionList from '../components/TransactionList';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { useData } from '../contexts/DataContext';
-import { parseEntry, transcribeAudio } from '../services/api';
+import { parseEntry, transcribeAudio, matchTransaction } from '../services/api';
 import './CheckInPage.css';
 
 function CheckInPage() {
@@ -18,6 +18,7 @@ function CheckInPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [matchInfo, setMatchInfo] = useState(null);
 
   // Voice recording hook
   const {
@@ -67,6 +68,25 @@ function CheckInPage() {
       const parsedResult = await parseEntry(transcript);
       console.log('✅ Parsed result:', parsedResult);
       
+      // Try to match with bank transactions
+      try {
+        console.log('🔍 Matching with bank transactions...');
+        const matchResult = await matchTransaction(parsedResult, transcript);
+        console.log('✅ Match result:', matchResult);
+        if (matchResult.confidence !== 'none') {
+          setMatchInfo(matchResult);
+        }
+      } catch (matchError) {
+        console.warn('⚠️ Transaction matching failed, continuing anyway:', matchError);
+      }
+      
+      // Save to DataContext
+      addCheckIn({
+        amount: parsedResult.amount?.toString() || '0',
+        merchant: parsedResult.category?.replace('_', ' ') || 'Voice Entry',
+        explanation: `${parsedResult.context || transcript} [${parsedResult.emotion || 'neutral'}]`
+      });
+      
       // Show success and clear recording
       setSubmitSuccess(true);
       clearRecording();
@@ -96,17 +116,32 @@ function CheckInPage() {
       const parsedResult = await parseEntry(transcript);
       console.log('Parsed entry:', parsedResult);
 
-      // TODO: Save the parsed entry to a database or state management
+      // Try to match with bank transactions
+      try {
+        console.log('🔍 Matching with bank transactions...');
+        const matchResult = await matchTransaction(parsedResult, transcript);
+        console.log('✅ Match result:', matchResult);
+        if (matchResult.confidence !== 'none') {
+          setMatchInfo(matchResult);
+        }
+      } catch (matchError) {
+        console.warn('⚠️ Transaction matching failed, continuing anyway:', matchError);
+      }
+
+      // Save to DataContext
+      addCheckIn(formData);
+      
       setSubmitSuccess(true);
       handleCloseModal();
       
       // Reset form after successful submission
+      setFormData({
+        amount: '',
+        merchant: '',
+        explanation: ''
+      });
+      
       setTimeout(() => {
-        setFormData({
-          amount: '',
-          merchant: '',
-          explanation: ''
-        });
         setSubmitSuccess(false);
       }, 3000);
     } catch (error) {
@@ -115,15 +150,6 @@ function CheckInPage() {
     } finally {
       setIsSubmitting(false);
     }
-    // Add check-in to global state
-    addCheckIn(formData);
-    handleCloseModal();
-    // Reset form
-    setFormData({
-      amount: '',
-      merchant: '',
-      explanation: ''
-    });
   };
 
   return (
@@ -142,6 +168,16 @@ function CheckInPage() {
       {submitError && (
         <Alert variant="danger" onClose={() => setSubmitError(null)} dismissible>
           {submitError}
+        </Alert>
+      )}
+      {matchInfo && (
+        <Alert variant="info" onClose={() => setMatchInfo(null)} dismissible>
+          <strong>🔍 Transaction Match Found!</strong>
+          <br />
+          Confidence: {matchInfo.confidence}
+          <br />
+          {matchInfo.reason}
+          {matchInfo.matched_transaction_id && ` (ID: ${matchInfo.matched_transaction_id})`}
         </Alert>
       )}
 
