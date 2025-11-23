@@ -76,8 +76,13 @@ function SummaryPage() {
       };
 
       const result = await generateSummary(selectedPersona, data);
-      setAiCoaching(result.summary);
-      const blob = await ttsText(result.summary); 
+      const summaryRaw = result.summary; 
+      const summaryVoice = summaryRaw.replace(/\{([^}]+)\}/g, '\n($1)');
+      const summaryText = summaryRaw.replace(/\{[^}]*\}\s*/g, "");
+      console.log(summaryVoice); 
+      console.log(summaryText);
+      setAiCoaching(summaryText);
+      const blob = await ttsText(summaryVoice); 
       const url = URL.createObjectURL(blob); 
       setAudioUrl(url); 
       console.log(audioUrl); 
