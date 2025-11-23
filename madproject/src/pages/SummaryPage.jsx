@@ -1,9 +1,73 @@
-import { Container, Row, Col, ProgressBar } from 'react-bootstrap';
+import { useState } from 'react';
+import { Container, Row, Col, ProgressBar, Button, Spinner, Alert } from 'react-bootstrap';
 import InsightCard from '../components/InsightCard';
 import { useData } from '../contexts/DataContext';
+import { 
+  spendingByCategory, 
+  totalSpent, 
+  emotionalTriggers, 
+  weeklyInsight,
+  coachingText 
+} from '../mockData';
+import { generateSummary } from '../services/api';
 import './SummaryPage.css';
 
 function SummaryPage() {
+  const [aiCoaching, setAiCoaching] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedPersona, setSelectedPersona] = useState('supportive_friend');
+
+  const handleGenerateAISummary = async () => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      // Prepare data for the backend
+      const data = {
+        goals: [
+          { description: "Keep food delivery under $75/week" },
+          { description: "Limit bar spending to $100/week" }
+        ],
+        spending: {
+          total_spent: totalSpent,
+          by_category: spendingByCategory.reduce((acc, item) => {
+            acc[item.category.toLowerCase()] = item.amount;
+            return acc;
+          }, {})
+        },
+        goalProgress: spendingByCategory.reduce((acc, item) => {
+          acc[item.category.toLowerCase()] = {
+            goal: 500,
+            actual: item.amount,
+            percent: item.percentage
+          };
+          return acc;
+        }, {}),
+        voiceEntries: [],
+        invisibleSpending: {
+          unlogged_transactions: 5,
+          unlogged_amount: 150
+        },
+        patterns: emotionalTriggers.reduce((acc, trigger, idx) => {
+          acc[`pattern_${idx}`] = {
+            pattern: trigger.trigger,
+            occurrences: trigger.count,
+            total_cost: 50 * trigger.count
+          };
+          return acc;
+        }, {})
+      };
+
+      const result = await generateSummary(selectedPersona, data);
+      setAiCoaching(result.summary);
+    } catch (err) {
+      console.error('Failed to generate AI summary:', err);
+      setError('Unable to generate AI coaching summary. The backend service may be unavailable.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   const { spendingByCategory, totalSpent, emotionalTriggers, checkIns } = useData();
   
   // Calculate weekly insight based on data
@@ -98,7 +162,59 @@ function SummaryPage() {
             title="This Week's Coaching"
             accent="success"
           >
-            <p className="coaching-text muted-text">{coachingText}</p>
+            {error && (
+              <Alert variant="warning" className="mb-3">
+                {error}
+              </Alert>
+            )}
+            
+            <div className="mb-3">
+              <label className="text-primary mb-2">Choose your coach's tone:</label>
+              <div className="btn-group w-100" role="group">
+                <Button
+                  variant={selectedPersona === 'supportive_friend' ? 'primary' : 'outline-primary'}
+                  onClick={() => setSelectedPersona('supportive_friend')}
+                  size="sm"
+                >
+                  Supportive Friend
+                </Button>
+                <Button
+                  variant={selectedPersona === 'stern_coach' ? 'primary' : 'outline-primary'}
+                  onClick={() => setSelectedPersona('stern_coach')}
+                  size="sm"
+                >
+                  Stern Coach
+                </Button>
+                <Button
+                  variant={selectedPersona === 'neutral_advisor' ? 'primary' : 'outline-primary'}
+                  onClick={() => setSelectedPersona('neutral_advisor')}
+                  size="sm"
+                >
+                  Neutral Advisor
+                </Button>
+              </div>
+            </div>
+
+            <p className="coaching-text muted-text">
+              {aiCoaching || coachingText}
+            </p>
+
+            <div className="mt-3">
+              <Button
+                className="btn-primary-custom"
+                onClick={handleGenerateAISummary}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Generating AI Summary...
+                  </>
+                ) : (
+                  '✨ Generate AI Coaching Summary'
+                )}
+              </Button>
+            </div>
           </InsightCard>
         </Col>
       </Row>

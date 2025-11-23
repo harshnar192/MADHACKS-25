@@ -9,6 +9,8 @@ dotenv.config();
 
 import { parseEntry } from "./parseVoiceEntry.js";
 import { generateSummary } from "./generateSummary.js";
+import { matchTransaction } from "./matchTransaction.js";
+import { readFileSync } from "fs";
 
 const fishAudio = new FishAudioClient({ apiKey: process.env.FISH_API_KEY });
 const upload = multer({ storage: multer.memoryStorage() });
@@ -107,6 +109,39 @@ app.post("/parse-entry", async (req, res) => {
   }
 });
 
+// Match transaction endpoint
+app.post("/match-transaction", async (req, res) => {
+  try {
+    const { parsedEntry, transcript, entryTime } = req.body;
+    
+    if (!parsedEntry || !transcript) {
+      return res.status(400).json({ 
+        error: "Invalid request: 'parsedEntry' and 'transcript' are required" 
+      });
+    }
+
+    // Load bank transactions
+    const bankData = JSON.parse(readFileSync('./files/bank_transactions.json', 'utf-8'));
+    const transactions = bankData.transactions || [];
+
+    console.log(`Matching transaction for: ${transcript.substring(0, 50)}...`);
+    
+    // Use current time if not provided
+    const timeToMatch = entryTime || new Date().toISOString();
+    
+    const matchResult = await matchTransaction(parsedEntry, transcript, timeToMatch, transactions);
+    console.log('Match result:', matchResult);
+    
+    res.json(matchResult);
+  } catch (error) {
+    console.error('Error matching transaction:', error);
+    res.status(500).json({ 
+      error: error.message,
+      details: 'Failed to match transaction. Please check API key and service availability.'
+    });
+  }
+});
+
 // Generate summary endpoint
 app.post("/generate-summary", async (req, res) => {
   try {
@@ -152,7 +187,7 @@ app.get("/health", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Endpoint not found',
-    availableEndpoints: ['/health', '/parse-entry', '/generate-summary']
+    availableEndpoints: ['/health', '/parse-entry', '/match-transaction', '/generate-summary', '/api/transcribe']
   });
 });
 
@@ -170,6 +205,8 @@ app.listen(PORT, () => {
   console.log(`\n🚀 MadHacks AI Backend Service running at http://localhost:${PORT}`);
   console.log(`📊 Available endpoints:`);
   console.log(`   - GET  /health`);
+  console.log(`   - POST /api/transcribe`);
   console.log(`   - POST /parse-entry`);
+  console.log(`   - POST /match-transaction`);
   console.log(`   - POST /generate-summary\n`);
 });

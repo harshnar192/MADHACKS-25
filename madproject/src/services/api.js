@@ -55,6 +55,38 @@ export async function generateSummary(persona, data) {
 }
 
 /**
+ * Match a parsed entry to bank transactions
+ * @param {Object} parsedEntry - The parsed entry data
+ * @param {string} transcript - The original transcript
+ * @param {string} entryTime - ISO timestamp of the entry
+ * @returns {Promise<Object>} Match result with confidence and matched transaction
+ */
+export async function matchTransaction(parsedEntry, transcript, entryTime = null) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/match-transaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        parsedEntry, 
+        transcript, 
+        entryTime: entryTime || new Date().toISOString() 
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to match transaction: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error matching transaction:', error);
+    throw error;
+  }
+}
+
+/**
  * Check if the backend API is available
  * @returns {Promise<boolean>} True if backend is healthy
  */
