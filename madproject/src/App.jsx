@@ -6,6 +6,7 @@ import CheckInPage from './pages/CheckInPage';
 import SummaryPage from './pages/SummaryPage';
 import VoicePage from './pages/VoicePage';
 import GoalsPage from './pages/GoalsPage';
+import TransactionsPage from './pages/TransactionsPage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -105,6 +106,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <GoalsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/transactions" 
+        element={
+          <ProtectedRoute>
+            <TransactionsPage />
           </ProtectedRoute>
         } 
       />

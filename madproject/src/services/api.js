@@ -87,6 +87,25 @@ export async function matchTransaction(parsedEntry, transcript, entryTime = null
 }
 
 /**
+ * Get bank transactions from the backend
+ * @returns {Promise<Object>} Bank transactions data
+ */
+export async function getBankTransactions() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/transactions`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch transactions: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bank transactions:', error);
+    throw error;
+  }
+}
+
+/**
  * Check if the backend API is available
  * @returns {Promise<boolean>} True if backend is healthy
  */
