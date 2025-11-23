@@ -174,6 +174,20 @@ app.post("/generate-summary", async (req, res) => {
   }
 });
 
+// Get bank transactions endpoint
+app.get("/api/transactions", (req, res) => {
+  try {
+    const bankData = JSON.parse(readFileSync('./files/bank_transactions.json', 'utf-8'));
+    res.json(bankData);
+  } catch (error) {
+    console.error('Error loading bank transactions:', error);
+    res.status(500).json({ 
+      error: 'Failed to load bank transactions',
+      message: error.message 
+    });
+  }
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ 
@@ -187,7 +201,7 @@ app.get("/health", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ 
     error: 'Endpoint not found',
-    availableEndpoints: ['/health', '/parse-entry', '/match-transaction', '/generate-summary', '/api/transcribe']
+    availableEndpoints: ['/health', '/api/transactions', '/parse-entry', '/match-transaction', '/generate-summary', '/api/transcribe']
   });
 });
 
@@ -205,6 +219,7 @@ app.listen(PORT, () => {
   console.log(`\n🚀 MadHacks AI Backend Service running at http://localhost:${PORT}`);
   console.log(`📊 Available endpoints:`);
   console.log(`   - GET  /health`);
+  console.log(`   - GET  /api/transactions`);
   console.log(`   - POST /api/transcribe`);
   console.log(`   - POST /parse-entry`);
   console.log(`   - POST /match-transaction`);
