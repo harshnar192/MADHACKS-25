@@ -398,3 +398,19 @@ export async function getImpulsivePurchases(userId = 'default') {
     throw error;
   }
 }
+
+export async function ttsText(text) {
+  const response = await fetch(`${API_BASE_URL}/api/tts?text=` + encodeURIComponent(text), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`TTS Failed: ${response.statusText}`); 
+  }
+
+  const blob = await response.blob();  
+  return blob; 
+}

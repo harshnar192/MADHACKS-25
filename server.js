@@ -147,6 +147,24 @@ app.post("/api/transcribe", upload.single("audio"), async (req, res) => {
   }
 });
 
+// Text-to-Speech (Synthesize)
+app.get("/api/tts", async (req, res) => {
+
+    const text = req.query.text; 
+    console.log(text); 
+    if (!text) {
+      return res.status(400).send("Missing text"); 
+    }
+
+    const audio = await fishAudio.textToSpeech.convert({
+      text: text
+    })
+    const buffer = Buffer.from(await new Response(audio).arrayBuffer());
+    res.setHeader("Content-Type", "audio/mp3");
+    res.send(buffer); 
+  }
+)
+
 // Parse voice entry endpoint
 app.post("/parse-entry", async (req, res) => {
   try {

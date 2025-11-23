@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Container, Row, Col, Button, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import InsightCard from '../components/InsightCard';
 import { useData } from '../contexts/DataContext';
-import { generateSummary } from '../services/api';
+import { generateSummary, ttsText } from '../services/api';
 import './SummaryPage.css';
 
 function SummaryPage() {
@@ -12,6 +12,8 @@ function SummaryPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState('supportive_friend');
+  const [audioUrl, setAudioUrl] = useState(null); 
+  const audioRef = useRef(null); 
   
   // Helper to convert trigger name back to mood format
   const getMoodFromTrigger = (trigger) => {
@@ -75,6 +77,10 @@ function SummaryPage() {
 
       const result = await generateSummary(selectedPersona, data);
       setAiCoaching(result.summary);
+      const blob = await ttsText(result.summary); 
+      const url = URL.createObjectURL(blob); 
+      setAudioUrl(url); 
+      console.log(audioUrl); 
     } catch (err) {
       console.error('Failed to generate AI summary:', err);
       setError('Unable to generate AI coaching summary. The backend service may be unavailable.');
@@ -100,6 +106,26 @@ function SummaryPage() {
   const coachingText = checkIns.length > 0
     ? `You've logged ${checkIns.length} emotional purchase${checkIns.length > 1 ? 's' : ''} with a total of $${(emotionalSpending || totalSpent || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} in emotional spending. ${emotionalTriggers.length > 0 ? `Your primary triggers are: ${emotionalTriggers.slice(0, 3).map(t => `${t.trigger} (${t.count})`).join(', ')}.` : ''} Consider setting up reminders to pause before making purchases when you notice these patterns.`
     : "Start logging your spending and emotions to get personalized insights and coaching.";
+
+  // Handle play button for text to speech
+  const handlePlay = () => {
+    if (audioRef.current) {
+      audioRef.current.play(); 
+    }
+  }
+
+  const handlePause = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  };
+
+  const handleRestart = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // ⏮ go to start
+      audioRef.current.play();          // ▶ play from beginning
+    }
+  };
   
   // Get top overspending category
   const topCategory = spendingByCategory.length > 0 ? spendingByCategory[0] : null;
@@ -237,6 +263,17 @@ function SummaryPage() {
             <p className="coaching-text muted-text">
               {aiCoaching || coachingText}
             </p>
+
+            {audioUrl && (
+              <div style={{ marginTop: "8px", display: "flex" }}>
+                <button onClick={handlePlay}>▶ Play</button>
+                <button onClick={handlePause}>⏸ Pause</button>
+                <button onClick={handleRestart}>⏮ Restart</button>
+
+
+                <audio ref={audioRef} src={audioUrl} />
+              </div>
+            )}
 
             <div className="mt-3">
               <Button
