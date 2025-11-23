@@ -78,9 +78,24 @@ export function useVoiceRecorder() {
         console.log('🛑 MediaRecorder onstop called. Total chunks:', audioChunksRef.current.length);
         
         if (audioChunksRef.current.length > 0) {
+          // Assume this mean successful 
           const finalBlob = new Blob(audioChunksRef.current, { type: mimeType });
           setAudioBlob(finalBlob);
           console.log('✅ Audio blob created:', finalBlob.size, 'bytes');
+          console.log(finalBlob); 
+          const formData = new FormData(); 
+          formData.append("audio", finalBlob, "recording.webm"); 
+          formData.append("duration", recordingTime.toString()); 
+          for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+          }
+          fetch("http://localhost:3000/api/message", {
+            method: "POST", 
+            body: formData
+          })
+          .then((json) => {
+            console.log(json.text); 
+          })
         } else {
           console.error('❌ No audio chunks collected!');
           setError('No audio data was recorded. Please try again.');
