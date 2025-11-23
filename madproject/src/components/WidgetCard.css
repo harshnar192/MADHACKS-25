@@ -1,0 +1,125 @@
+/* Minimalist Widget Card - Google-like */
+.widget-card {
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  padding: 24px;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 16px;
+  transition: background-color 0.2s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.widget-card:hover {
+  background-color: var(--bg-card-hover);
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.widget-card::before {
+  display: none;
+}
+
+.widget-card.widget-interactive {
+  cursor: pointer;
+}
+
+.widget-card.widget-interactive:active {
+  transform: none;
+  background-color: var(--bg-card-hover);
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.widget-title {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  flex: 1;
+  letter-spacing: 0;
+}
+
+.widget-subtitle {
+  font-size: 13px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.widget-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.widget-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.widget-content {
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.widget-content.expanded {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.widget-hover-indicator {
+  display: none;
+}
+
+/* Remove accent borders for minimalism */
+.widget-card.accent-primary,
+.widget-card.accent-success,
+.widget-card.accent-danger {
+  border-left: none;
+}
+
+.widget-card.accent-primary:hover,
+.widget-card.accent-success:hover,
+.widget-card.accent-danger:hover {
+  border-left: none;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .widget-card {
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .widget-title {
+    font-size: 16px;
+  }
+}

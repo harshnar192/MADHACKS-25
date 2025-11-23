@@ -1,0 +1,83 @@
+/* Minimalist Bottom Tab Navigation */
+.bottom-tab-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-subtle);
+  padding: 8px 0;
+  z-index: 1000;
+  box-shadow: none;
+}
+
+.bottom-tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  margin: 0 4px;
+}
+
+.bottom-tab-item .tab-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.bottom-tab-item .tab-label {
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bottom-tab-item:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.bottom-tab-item.active {
+  color: var(--accent-primary);
+}
+
+.bottom-tab-item.active .tab-icon {
+  transform: none;
+  opacity: 1;
+}
+
+/* Less prominent on tablet screens */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .bottom-tab-nav {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto 20px auto;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+}
+
+/* Hide on large desktop screens */
+@media (min-width: 1024px) {
+  .bottom-tab-nav {
+    display: none;
+  }
+}
+
+/* Add padding to content to prevent overlap with bottom nav */
+@media (max-width: 767px) {
+  .app-shell {
+    padding-bottom: 70px;
+  }
+}

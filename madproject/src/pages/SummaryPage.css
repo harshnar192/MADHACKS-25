@@ -1,0 +1,116 @@
+.summary-page {
+  padding-bottom: 40px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+/* Spending Breakdown */
+.spending-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.category-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.category-amount {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.category-progress {
+  width: 100%;
+  margin: 4px 0;
+}
+
+.category-percentage {
+  font-size: 12px;
+  align-self: flex-end;
+}
+
+/* Emotional Insights */
+.emotional-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trigger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.trigger-item:last-of-type {
+  border-bottom: none;
+}
+
+.trigger-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.trigger-count {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-danger);
+}
+
+.insight-highlight {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: rgba(249, 115, 115, 0.1);
+  border-left: 3px solid var(--accent-danger);
+  border-radius: 8px;
+}
+
+.insight-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.insight-text strong {
+  color: var(--accent-danger);
+  font-weight: 600;
+}
+
+/* Coaching Text */
+.coaching-text {
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .trigger-count {
+    font-size: 24px;
+  }
+  
+  .category-amount {
+    font-size: 14px;
+  }
+}
+
