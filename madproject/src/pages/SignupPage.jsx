@@ -49,16 +49,18 @@ function SignupPage() {
       return;
     }
 
-    // Mock signup - TODO: Replace with real API
-    setTimeout(() => {
-      const success = signup(formData.email, formData.password, formData.name);
+    try {
+      const success = await signup(formData.email, formData.password, formData.name);
       if (success) {
         navigate('/');
       } else {
         setError('Signup failed. Please try again.');
       }
+    } catch (error) {
+      setError(error.message || 'Signup failed. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   return (

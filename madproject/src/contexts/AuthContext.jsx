@@ -1,46 +1,96 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { loginUser, signupUser, verifyToken, getToken, getUser, removeToken, setUser as saveUser } from '../services/api';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUserState] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (email, password) => {
-    // TODO: Replace with real authentication API call
-    // For now, simple mock authentication
-    if (email && password) {
+  // Check for existing token on mount
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const token = getToken();
+        const storedUser = getUser();
+        
+        if (token && storedUser) {
+          // Verify token is still valid
+          try {
+            const data = await verifyToken();
+            setIsAuthenticated(true);
+            setIsGuest(false);
+            setUserState(data.user);
+            if (data.user) {
+              saveUser(data.user);
+            }
+          } catch (error) {
+            // Token invalid, clear storage
+            removeToken();
+            setIsAuthenticated(false);
+            setUserState(null);
+          }
+        } else {
+          setIsAuthenticated(false);
+          setUserState(null);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+        setUserState(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    checkAuth();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const data = await loginUser(email, password);
       setIsAuthenticated(true);
       setIsGuest(false);
-      setUser({ email, name: email.split('@')[0] });
+      setUserState(data.user);
+      if (data.user) {
+        saveUser(data.user);
+      }
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
-  const signup = (email, password, name) => {
-    // TODO: Replace with real signup API call
-    // For now, simple mock signup
-    if (email && password && name) {
+  const signup = async (email, password, name) => {
+    try {
+      const data = await signupUser(email, password, name);
       setIsAuthenticated(true);
       setIsGuest(false);
-      setUser({ email, name });
+      setUserState(data.user);
+      if (data.user) {
+        saveUser(data.user);
+      }
       return true;
+    } catch (error) {
+      console.error('Signup error:', error);
+      return false;
     }
-    return false;
   };
 
   const continueAsGuest = () => {
     setIsAuthenticated(true);
     setIsGuest(true);
-    setUser({ name: 'Guest', email: null });
+    setUserState({ name: 'Guest', email: null });
   };
 
   const logout = () => {
+    removeToken();
     setIsAuthenticated(false);
     setIsGuest(false);
-    setUser(null);
+    setUserState(null);
   };
 
   return (
@@ -48,6 +98,7 @@ export function AuthProvider({ children }) {
       isAuthenticated, 
       user, 
       isGuest,
+      isLoading,
       login, 
       signup, 
       continueAsGuest,

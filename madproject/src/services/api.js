@@ -166,6 +166,122 @@ export async function getImpulsivePurchases() {
 }
 
 /**
+ * Login user with email and password
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise<Object>} User data and token
+ */
+export async function loginUser(email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Login failed');
+    }
+
+    const data = await response.json();
+    
+    // Store token and user
+    if (data.token) {
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sign up new user
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} name - User name
+ * @returns {Promise<Object>} User data and token
+ */
+export async function signupUser(email, password, name) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, name }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Signup failed');
+    }
+
+    const data = await response.json();
+    
+    // Store token and user
+    if (data.token) {
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error signing up:', error);
+    throw error;
+  }
+}
+
+/**
+ * Verify JWT token and get user data
+ * @returns {Promise<Object>} User data
+ */
+export async function verifyToken() {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      // Token is invalid, clear storage
+      removeToken();
+      throw new Error('Invalid or expired token');
+    }
+
+    const data = await response.json();
+    
+    // Update stored user data
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    throw error;
+  }
+}
+
+/**
  * Transcribe audio blob to text using Fish Audio backend service
  * @param {Blob} audioBlob - The audio blob to transcribe
  * @param {string} duration - Recording duration

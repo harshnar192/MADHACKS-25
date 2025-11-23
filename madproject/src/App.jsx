@@ -16,7 +16,16 @@ import './App.css';
 
 // Protected Route Component - Allows both authenticated and guest users
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="app-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <p className="muted-text">Loading...</p>
+      </div>
+    );
+  }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
