@@ -3,6 +3,7 @@ import { Container, Modal, Form, Button, Row } from 'react-bootstrap';
 import InsightCard from '../components/InsightCard';
 import TransactionList from '../components/TransactionList';
 import { recentCheckIns } from '../mockData';
+import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import './CheckInPage.css';
 
 function CheckInPage() {
@@ -13,6 +14,18 @@ function CheckInPage() {
     explanation: ''
   });
 
+  // Voice recording hook
+  const {
+    isRecording,
+    audioBlob,
+    recordingTime,
+    recordingTimeSeconds,
+    error: recordingError,
+    startRecording,
+    stopRecording,
+    clearRecording,
+  } = useVoiceRecorder();
+
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
 
@@ -22,6 +35,15 @@ function CheckInPage() {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleVoiceToggle = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      // Don't clear here - let startRecording handle resetting the timer
+      startRecording();
+    }
   };
 
   // TODO: Replace with real API call when backend is integrated
@@ -52,14 +74,61 @@ function CheckInPage() {
             <div className="check-in-card-content">
               <div className="check-in-icon">❓</div>
               <p className="check-in-prompt text-primary">Tell me what happened.</p>
+              
+              {/* Voice Recording Section */}
+              <div className="voice-recording-section">
+                <div className="recording-controls">
+                  <Button 
+                    className={`check-in-btn ${isRecording ? 'btn-recording' : 'btn-primary-custom'}`}
+                    onClick={handleVoiceToggle}
+                  >
+                    {isRecording ? (
+                      <>
+                        <span className="recording-indicator">⏹️</span> Stop Recording
+                      </>
+                    ) : (
+                      <>
+                        <span>🎤</span> Record Voice
+                      </>
+                    )}
+                    {/* Always show timer when recording */}
+                    {isRecording && (
+                      <span className="recording-timer">{recordingTime}</span>
+                    )}
+                  </Button>
+                  
+                  {isRecording && (
+                    <div className="recording-status">
+                      <span className="recording-dot"></span>
+                      <span className="recording-text">Recording...</span>
+                      <span className="recording-time-display">{recordingTime}</span>
+                    </div>
+                  )}
+                  
+                  {recordingError && (
+                    <div className="recording-error">
+                      {recordingError}
+                    </div>
+                  )}
+                  
+                  {audioBlob && !isRecording && (
+                    <div className="recording-success">
+                      <span className="success-icon">✅</span>
+                      <span>Recording complete! ({recordingTime}, {Math.round(audioBlob.size / 1024)} KB)</span>
+                      <Button 
+                        className="btn-secondary-custom"
+                        onClick={clearRecording}
+                        size="sm"
+                        style={{ marginLeft: '12px' }}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="check-in-buttons">
-                {/* TODO: Implement voice recording when backend/speech-to-text API is integrated */}
-                <Button 
-                  className="btn-primary-custom check-in-btn"
-                  onClick={() => alert('Voice recording coming soon!')}
-                >
-                  🎤 Record Voice
-                </Button>
                 <Button 
                   className="btn-secondary-custom check-in-btn"
                   onClick={handleShowModal}

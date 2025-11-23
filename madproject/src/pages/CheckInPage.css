@@ -30,7 +30,7 @@
   flex-direction: column;
   gap: 12px;
   max-width: 400px;
-  margin: 0 auto;
+  margin: 24px auto 0 auto;
 }
 
 .check-in-btn {
@@ -38,6 +38,210 @@
   padding: 16px 24px;
   font-size: 16px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Voice Recording Section */
+.voice-recording-section {
+  margin: 32px 0;
+  padding: 24px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.recording-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-recording {
+  background-color: var(--accent-danger) !important;
+  color: white !important;
+  border: none !important;
+  animation: pulse-recording 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-recording {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(242, 139, 130, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(242, 139, 130, 0);
+  }
+}
+
+.recording-indicator {
+  margin-right: 8px;
+}
+
+.recording-timer {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.recording-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-danger);
+  font-size: 14px;
+  margin-top: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.recording-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-danger);
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.recording-text {
+  font-weight: 500;
+}
+
+.recording-time-display {
+  margin-left: auto;
+  font-weight: 600;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  background-color: rgba(242, 139, 130, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.transcribing-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-primary);
+  font-size: 14px;
+}
+
+.transcribing-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.transcribing-text {
+  font-weight: 500;
+}
+
+.recording-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--accent-success);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.success-icon {
+  font-size: 16px;
+}
+
+.recording-error {
+  background-color: rgba(242, 139, 130, 0.1);
+  border: 1px solid rgba(242, 139, 130, 0.3);
+  color: var(--accent-danger);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+}
+
+/* Transcription Section */
+.transcription-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.transcription-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.transcription-textbox {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 100px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.transcription-textbox:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(138, 180, 248, 0.1);
+}
+
+.transcription-textbox::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.transcription-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.transcription-actions .btn {
+  padding: 8px 20px;
+  font-size: 14px;
 }
 
 .check-in-note {
