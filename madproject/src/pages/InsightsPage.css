@@ -71,6 +71,14 @@
   text-shadow: none;
 }
 
+.pie-chart-wrapper {
+  margin: 24px 0 32px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 300px;
+}
+
 .emotion-tags-row {
   display: flex;
   justify-content: flex-start;

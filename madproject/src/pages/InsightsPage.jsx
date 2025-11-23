@@ -3,6 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import WidgetCard from '../components/WidgetCard';
 import EmotionTag from '../components/EmotionTag';
+import EmotionPieChart from '../components/EmotionPieChart';
 import TransactionList from '../components/TransactionList';
 import { 
   emotionalSpending, 
@@ -45,6 +46,12 @@ function InsightsPage() {
             >
               <div className="emotional-spending-content">
                 <div className="spending-amount number-display">${emotionalSpending}</div>
+                
+                {/* Pie Chart */}
+                <div className="pie-chart-wrapper">
+                  <EmotionPieChart data={emotionBreakdown} />
+                </div>
+                
                 <div className="emotion-tags-row">
                   {emotionBreakdown.map((emotion, index) => (
                     <div

@@ -53,7 +53,7 @@ function LoginPage() {
         <div className="auth-card">
           <div className="auth-header">
             <h1 className="auth-title">Welcome back</h1>
-            <p className="auth-subtitle muted-text">Sign in to your account</p>
+            <p className="auth-subtitle muted-text">Login to your account</p>
           </div>
 
           <Form onSubmit={handleSubmit} className="auth-form">
@@ -96,7 +96,7 @@ function LoginPage() {
               className="btn-primary-custom auth-submit-btn"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </Form>
 

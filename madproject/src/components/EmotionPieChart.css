@@ -1,0 +1,56 @@
+.emotion-pie-chart-container {
+  width: 100%;
+  padding: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.pie-tooltip {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-label {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.tooltip-value {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Recharts legend customization */
+.recharts-legend-wrapper {
+  padding-top: 20px !important;
+}
+
+.recharts-legend-item {
+  margin-right: 20px !important;
+}
+
+.recharts-legend-item-text {
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+}
+
+/* Recharts tooltip customization */
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .emotion-pie-chart-container {
+    padding: 10px 0;
+    min-height: 250px;
+  }
+}
