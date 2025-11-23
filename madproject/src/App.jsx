@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
 import InsightsPage from './pages/InsightsPage';
 import CheckInPage from './pages/CheckInPage';
 import SummaryPage from './pages/SummaryPage';
@@ -122,9 +123,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <HashRouter>
-        <AppRoutes />
-      </HashRouter>
+      <DataProvider>
+        <HashRouter>
+          <AppRoutes />
+        </HashRouter>
+      </DataProvider>
     </AuthProvider>
   );
 }

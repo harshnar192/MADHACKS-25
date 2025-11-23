@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Container, Modal, Form, Button, Row } from 'react-bootstrap';
 import InsightCard from '../components/InsightCard';
 import TransactionList from '../components/TransactionList';
-import { recentCheckIns } from '../mockData';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
+import { useData } from '../contexts/DataContext';
 import './CheckInPage.css';
 
 function CheckInPage() {
+  const { addCheckIn, recentCheckIns } = useData();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     amount: '',
@@ -46,11 +47,10 @@ function CheckInPage() {
     }
   };
 
-  // TODO: Replace with real API call when backend is integrated
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Placeholder: In real app, this would save the data to backend
-    console.log('Check-in submitted:', formData);
+    // Add check-in to global state
+    addCheckIn(formData);
     handleCloseModal();
     // Reset form
     setFormData({
