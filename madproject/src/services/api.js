@@ -120,6 +120,102 @@ export async function checkHealth() {
 }
 
 /**
+ * Save an emotional transaction to the database
+ * @param {Object} data - Transaction data
+ * @returns {Promise<Object>} Saved transaction
+ */
+export async function saveEmotionalTransaction(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/emotional-transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to save emotional transaction: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving emotional transaction:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get emotional transactions for a user
+ * @param {string} userId - User ID
+ * @param {number} limit - Max number of transactions
+ * @returns {Promise<Object>} Transactions list
+ */
+export async function getEmotionalTransactions(userId = 'default', limit = 100) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/emotional-transactions?userId=${userId}&limit=${limit}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch emotional transactions: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching emotional transactions:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get emotional spending breakdown for charts
+ * @param {string} userId - User ID
+ * @param {string} timeframe - 'day', 'week', 'month', 'all'
+ * @returns {Promise<Object>} Breakdown data
+ */
+export async function getEmotionalSpendingBreakdown(userId = 'default', timeframe = 'month') {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/emotional-spending/breakdown?userId=${userId}&timeframe=${timeframe}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch breakdown: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching emotional spending breakdown:', error);
+    throw error;
+  }
+}
+
+/**
+ * Confirm or deny a transaction that needed correction
+ * @param {string} transactionId - Transaction ID
+ * @param {boolean} confirmed - User confirmed or denied
+ * @param {string} correctedMerchant - Corrected merchant name if confirmed
+ * @returns {Promise<Object>} Updated transaction
+ */
+export async function confirmTransaction(transactionId, confirmed, correctedMerchant = null) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/emotional-transactions/${transactionId}/confirm`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ confirmed, correctedMerchant }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to confirm transaction: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error confirming transaction:', error);
+    throw error;
+  }
+}
+
+/**
  * Transcribe audio blob to text using Fish Audio backend service
  * @param {Blob} audioBlob - The audio blob to transcribe
  * @param {string} duration - Recording duration

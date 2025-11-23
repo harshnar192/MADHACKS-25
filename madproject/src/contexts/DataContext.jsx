@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { getEmotionalTransactions } from '../services/api';
 
 const DataContext = createContext();
 
@@ -30,41 +31,44 @@ function getIconForMerchant(merchant) {
 }
 
 export function DataProvider({ children }) {
-  // Initialize with mock data
-  const [checkIns, setCheckIns] = useState(() => {
-    const saved = localStorage.getItem('madHacks_checkIns');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Default mock data
-    return [
-      {
-        id: Date.now() - 2,
-        label: 'Uber Eats',
-        amount: '$47',
-        note: 'Tired after work',
-        icon: '🍔',
-        amountType: 'negative',
-        emotion: 'Tired',
-        amountValue: 47
-      },
-      {
-        id: Date.now() - 1,
-        label: 'Nike',
-        amount: '$200',
-        note: 'Stressed before interview',
-        icon: '👟',
-        amountType: 'negative',
-        emotion: 'Stress',
-        amountValue: 200
-      }
-    ];
-  });
+  // Fetch from MongoDB instead of localStorage
+  const [checkIns, setCheckIns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Save to localStorage whenever checkIns change
+  // Fetch emotional transactions from MongoDB on mount
   useEffect(() => {
-    localStorage.setItem('madHacks_checkIns', JSON.stringify(checkIns));
-  }, [checkIns]);
+    async function loadData() {
+      try {
+        setIsLoading(true);
+        const response = await getEmotionalTransactions('default', 100);
+        
+        // Transform MongoDB documents to the format expected by UI
+        const transformedData = (response.transactions || []).map(tx => ({
+          id: tx._id,
+          label: tx.merchant || 'Unknown',
+          amount: `$${Number(tx.amount || 0).toFixed(2)}`,
+          note: tx.context || tx.transcript || '',
+          icon: getIconForMerchant(tx.merchant || ''),
+          amountType: 'negative',
+          emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
+          amountValue: Number(tx.amount || 0),
+          timestamp: tx.entry_time
+        }));
+
+        setCheckIns(transformedData);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load emotional transactions:', err);
+        setError(err.message);
+        setCheckIns([]); // Empty state on error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
 
   // Calculate emotional spending breakdown
   const emotionBreakdown = useMemo(() => {
@@ -132,25 +136,25 @@ export function DataProvider({ children }) {
       }));
   }, [checkIns]);
 
-  // Add new check-in
-  const addCheckIn = (data) => {
-    const amountValue = parseFloat(data.amount.replace(/[^0-9.]/g, '')) || 0;
-    const emotion = extractEmotion(data.explanation || '');
-    const icon = getIconForMerchant(data.merchant || '');
-    
-    const newCheckIn = {
-      id: Date.now(),
-      label: data.merchant || 'Unknown',
-      amount: data.amount.startsWith('$') ? data.amount : `$${data.amount}`,
-      note: data.explanation || '',
-      icon: icon,
-      amountType: 'negative',
-      emotion: emotion,
-      amountValue: amountValue
-    };
-
-    setCheckIns(prev => [newCheckIn, ...prev]);
-    return newCheckIn;
+  // Refresh data from MongoDB (call this after saving a new transaction)
+  const refreshData = async () => {
+    try {
+      const response = await getEmotionalTransactions('default', 100);
+      const transformedData = (response.transactions || []).map(tx => ({
+        id: tx._id,
+        label: tx.merchant || 'Unknown',
+        amount: `$${Number(tx.amount || 0).toFixed(2)}`,
+        note: tx.context || tx.transcript || '',
+        icon: getIconForMerchant(tx.merchant || ''),
+        amountType: 'negative',
+        emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
+        amountValue: Number(tx.amount || 0),
+        timestamp: tx.entry_time
+      }));
+      setCheckIns(transformedData);
+    } catch (err) {
+      console.error('Failed to refresh data:', err);
+    }
   };
 
   // Get recent check-ins
@@ -201,14 +205,16 @@ export function DataProvider({ children }) {
 
   const value = {
     checkIns,
-    addCheckIn,
+    refreshData,
     recentCheckIns,
     emotionBreakdown,
     emotionalSpending,
     invisibleSpending,
     spendingByCategory,
     emotionalTriggers,
-    totalSpent: emotionalSpending
+    totalSpent: emotionalSpending,
+    isLoading,
+    error
   };
 
   return (
