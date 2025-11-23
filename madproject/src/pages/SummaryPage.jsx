@@ -118,7 +118,7 @@ function SummaryPage() {
 
       const result = await generateSummary(selectedPersona, data);
       const summaryRaw = result.summary; 
-      const summaryVoice = summaryRaw.replace(/\{([^}]+)\}/g, '\n($1)');
+      const summaryVoice = summaryRaw.replace(/\{([^}]+)\}/g, '\n($1)').slice(1);
       const summaryText = summaryRaw.replace(/\{[^}]*\}\s*/g, "");
       console.log(summaryVoice); 
       console.log(summaryText);
