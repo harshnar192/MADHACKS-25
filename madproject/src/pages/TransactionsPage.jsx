@@ -100,6 +100,7 @@ function TransactionsPage() {
               merchant: tx.merchant,
               amount: tx.amount,
               category: tx.category,
+              type: tx.type,
               date: tx.date,
               datetime: tx.datetime,
               dayOfWeek: tx.day_of_week,

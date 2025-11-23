@@ -1,12 +1,29 @@
 /* About Page - Minimalist Google-like */
 .about-page {
   padding-bottom: 40px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Ensure Bootstrap Container uses full width with minimal padding */
+.about-page .container,
+.about-page .container-fluid {
+  width: 100%;
+  max-width: 100%;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
 }
 
 .about-hero-section {
   text-align: center;
   padding: 60px 0 40px 0;
   margin-bottom: 40px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .hero-icon {
@@ -39,6 +56,8 @@
   color: var(--text-primary);
   margin: 0;
   font-weight: 400;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .features-section,
@@ -58,6 +77,8 @@
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .step-card {
@@ -102,6 +123,8 @@
   line-height: 1.6;
   margin: 0;
   flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .cta-section {
@@ -149,6 +172,12 @@
 
 /* Responsive */
 @media (max-width: 991px) {
+  .about-page .container,
+  .about-page .container-fluid {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .hero-title {
     font-size: 40px;
   }
@@ -156,38 +185,144 @@
   .section-heading {
     font-size: 24px;
   }
+
+  .description-intro-section {
+    margin-bottom: 32px;
+  }
+
+  .features-section,
+  .how-it-works-section {
+    margin-bottom: 32px;
+  }
 }
 
 @media (max-width: 767px) {
+  .about-page {
+    padding-bottom: 20px;
+  }
+
+  .about-page .container,
+  .about-page .container-fluid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .about-hero-section {
-    padding: 40px 0 32px 0;
+    padding: 32px 0 24px 0;
+    margin-bottom: 32px;
   }
 
   .hero-icon {
     font-size: 56px;
+    margin-bottom: 16px;
   }
 
   .hero-title {
     font-size: 32px;
+    margin-bottom: 8px;
   }
 
   .hero-subtitle {
     font-size: 16px;
+    padding: 0 12px;
   }
 
   .section-heading {
     font-size: 22px;
     margin-bottom: 24px;
+    padding: 0 4px;
+  }
+
+  .description-intro-section {
+    margin-bottom: 32px;
+  }
+
+  .intro-text {
+    font-size: 15px;
+    padding: 0 4px;
+  }
+
+  .features-section,
+  .how-it-works-section {
+    margin-bottom: 32px;
+  }
+
+  .feature-description {
+    font-size: 13px;
+  }
+
+  .step-card {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .step-description {
+    font-size: 13px;
+  }
+
+  .cta-section {
+    margin-top: 32px;
+  }
+
+  .cta-content {
+    padding: 16px 8px;
+  }
+
+  .cta-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .cta-text {
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding: 0 4px;
   }
 
   .cta-buttons {
     flex-direction: column;
     width: 100%;
+    gap: 10px;
   }
 
   .cta-buttons .btn-primary-custom,
   .cta-buttons .btn-secondary-custom {
     width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 575px) {
+  .about-page .container,
+  .about-page .container-fluid {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hero-icon {
+    font-size: 48px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .section-heading {
+    font-size: 20px;
+  }
+
+  .intro-text {
+    font-size: 14px;
+  }
+
+  .feature-description,
+  .step-description {
+    font-size: 12px;
   }
 }
 

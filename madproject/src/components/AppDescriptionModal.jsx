@@ -34,8 +34,8 @@ function AppDescriptionModal({ show, onHide }) {
         <div className="modal-title-section">
           <div className="app-icon-large">💎</div>
           <div>
-            <Modal.Title className="modal-title-text">Clarity</Modal.Title>
-            <p className="modal-subtitle muted-text">Your Emotional Spending Coach</p>
+            <Modal.Title className="modal-title-text">Pulse</Modal.Title>
+            <p className="modal-subtitle muted-text">Take Control of Your Emotional Spending</p>
           </div>
         </div>
       </Modal.Header>
@@ -44,8 +44,9 @@ function AppDescriptionModal({ show, onHide }) {
         <div className="app-description-content">
           <div className="description-intro">
             <p className="intro-text">
-              Clarity helps you understand and manage your emotional spending by connecting 
-              your financial decisions with your emotional state.
+              Stop wondering where your money went. Pulse reveals the hidden connection between 
+              your emotions and your spending, giving you the insights you need to take control 
+              of your finances and build healthier money habits.
             </p>
           </div>
 
@@ -54,8 +55,8 @@ function AppDescriptionModal({ show, onHide }) {
               <div className="feature-icon">📊</div>
               <h3 className="feature-title">Insights</h3>
               <p className="feature-description">
-                Discover patterns in your spending behavior and identify emotional triggers 
-                that lead to unnecessary purchases.
+                Unlock powerful insights into your spending psychology with beautiful visualizations 
+                and AI analysis that reveals the emotional triggers driving your purchases.
               </p>
             </div>
 
@@ -63,8 +64,8 @@ function AppDescriptionModal({ show, onHide }) {
               <div className="feature-icon">✍️</div>
               <h3 className="feature-title">Check-in</h3>
               <p className="feature-description">
-                Log how you're feeling and track your spending decisions in real-time 
-                to build awareness around emotional spending.
+                Capture your emotional state at the moment of purchase. Build self-awareness 
+                and break the cycle of unconscious spending by understanding the "why" behind every transaction.
               </p>
             </div>
 
@@ -72,8 +73,8 @@ function AppDescriptionModal({ show, onHide }) {
               <div className="feature-icon">📋</div>
               <h3 className="feature-title">Summary</h3>
               <p className="feature-description">
-                View comprehensive spending overviews and receive personalized insights 
-                about your financial habits.
+                Get a complete picture of your financial health with smart summaries, 
+                overspending alerts, and actionable recommendations tailored to your unique spending style.
               </p>
             </div>
 
@@ -81,8 +82,8 @@ function AppDescriptionModal({ show, onHide }) {
               <div className="feature-icon">🎤</div>
               <h3 className="feature-title">Voice</h3>
               <p className="feature-description">
-                Record voice memos to add context to your transactions and capture 
-                your emotional state at the moment of purchase.
+                Use voice to quickly capture your thoughts and feelings. Just speak naturally— 
+                Pulse's AI understands your emotions and automatically links them to your transactions.
               </p>
             </div>
 
@@ -90,8 +91,8 @@ function AppDescriptionModal({ show, onHide }) {
               <div className="feature-icon">🎯</div>
               <h3 className="feature-title">Goals</h3>
               <p className="feature-description">
-                Set and track your financial goals while identifying emotional blockers 
-                that prevent you from achieving them.
+                Set meaningful financial goals and track your progress with AI coaching 
+                that helps you overcome the emotional barriers standing between you and your financial freedom.
               </p>
             </div>
           </div>
@@ -110,7 +111,8 @@ function AppDescriptionModal({ show, onHide }) {
                 <div className="step-number">2</div>
                 <div className="step-content">
                   <strong>Identify Patterns</strong>
-                  <p>Clarity analyzes your data to reveal emotional triggers and spending patterns.</p>
+                  <p>Pulse's AI analyzes your spending in real-time, uncovering the emotional triggers 
+                  you never knew existed—whether it's stress, peer pressure, or late-night fatigue.</p>
                 </div>
               </div>
               <div className="step-item">

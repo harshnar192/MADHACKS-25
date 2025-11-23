@@ -63,98 +63,98 @@ function TopNavMenu() {
             onClick={() => setExpanded(false)}
           >
             <span className="brand-icon">💎</span>
-            Clarity
+            Pulse
           </NavLink>
           
           <Navbar.Toggle aria-controls="basic-navbar-nav" className="navbar-toggle-custom" />
           
           <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto main-nav">
-              {mainNavItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `nav-link-custom ${isActive ? 'active' : ''}`
-                  }
-                  onClick={() => setExpanded(false)}
-                >
-                  <span className="nav-icon">{item.icon}</span>
-                  <span className="nav-label">{item.label}</span>
-                </NavLink>
-              ))}
-            </Nav>
-            
-            <Nav className="nav-actions">
-              {/* User Info */}
-              <div className="user-info">
+                <Nav className="me-auto main-nav">
+                  {mainNavItems.map((item) => (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `nav-link-custom ${isActive ? 'active' : ''}`
+                      }
+                      onClick={() => setExpanded(false)}
+                    >
+                      <span className="nav-icon">{item.icon}</span>
+                      <span className="nav-label">{item.label}</span>
+                    </NavLink>
+                  ))}
+                </Nav>
+                
+                <Nav className="nav-actions">
+                  {/* User Info */}
+                  <div className="user-info">
                 <span className="user-name">Default User</span>
-              </div>
-              
-              {/* Settings Dropdown */}
-              <NavDropdown 
-                title={
-                  <span className="settings-toggle">
-                    <span className="settings-icon">⚙️</span>
-                    <span className="settings-label">Settings</span>
-                    <span className="dropdown-arrow">▼</span>
-                  </span>
-                } 
-                id="settings-dropdown"
-                className="nav-dropdown-custom"
-                align="end"
-              >
-                <NavDropdown.Item 
-                  href={settingsItems[0].href}
-                  className="settings-dropdown-item"
-                >
-                  <span 
-                    className="dropdown-item-icon"
-                    style={{ color: settingsItems[0].iconColor }}
+                  </div>
+                  
+                  {/* Settings Dropdown */}
+                  <NavDropdown 
+                    title={
+                      <span className="settings-toggle">
+                        <span className="settings-icon">⚙️</span>
+                        <span className="settings-label">Settings</span>
+                        <span className="dropdown-arrow">▼</span>
+                      </span>
+                    } 
+                    id="settings-dropdown"
+                    className="nav-dropdown-custom"
+                    align="end"
                   >
-                    {settingsItems[0].icon}
-                  </span>
-                  <span className="dropdown-item-label">{settingsItems[0].label}</span>
-                </NavDropdown.Item>
-                <NavDropdown.Item 
-                  href={settingsItems[1].href}
-                  className="settings-dropdown-item"
-                >
-                  <span 
-                    className="dropdown-item-icon"
-                    style={{ color: settingsItems[1].iconColor }}
-                  >
-                    {settingsItems[1].icon}
-                  </span>
-                  <span className="dropdown-item-label">{settingsItems[1].label}</span>
-                </NavDropdown.Item>
-                <NavDropdown.Item 
-                  href={settingsItems[2].href}
-                  className="settings-dropdown-item"
-                >
-                  <span 
-                    className="dropdown-item-icon"
-                    style={{ color: settingsItems[2].iconColor }}
-                  >
-                    {settingsItems[2].icon}
-                  </span>
-                  <span className="dropdown-item-label">{settingsItems[2].label}</span>
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item 
-                  href={settingsItems[3].href}
-                  className="settings-dropdown-item"
-                >
-                  <span 
-                    className="dropdown-item-icon"
-                    style={{ color: settingsItems[3].iconColor }}
-                  >
-                    {settingsItems[3].icon}
-                  </span>
-                  <span className="dropdown-item-label">{settingsItems[3].label}</span>
-                </NavDropdown.Item>
-              </NavDropdown>
-            </Nav>
+                    <NavDropdown.Item 
+                      href={settingsItems[0].href}
+                      className="settings-dropdown-item"
+                    >
+                      <span 
+                        className="dropdown-item-icon"
+                        style={{ color: settingsItems[0].iconColor }}
+                      >
+                        {settingsItems[0].icon}
+                      </span>
+                      <span className="dropdown-item-label">{settingsItems[0].label}</span>
+                    </NavDropdown.Item>
+                    <NavDropdown.Item 
+                      href={settingsItems[1].href}
+                      className="settings-dropdown-item"
+                    >
+                      <span 
+                        className="dropdown-item-icon"
+                        style={{ color: settingsItems[1].iconColor }}
+                      >
+                        {settingsItems[1].icon}
+                      </span>
+                      <span className="dropdown-item-label">{settingsItems[1].label}</span>
+                    </NavDropdown.Item>
+                    <NavDropdown.Item 
+                      href={settingsItems[2].href}
+                      className="settings-dropdown-item"
+                    >
+                      <span 
+                        className="dropdown-item-icon"
+                        style={{ color: settingsItems[2].iconColor }}
+                      >
+                        {settingsItems[2].icon}
+                      </span>
+                      <span className="dropdown-item-label">{settingsItems[2].label}</span>
+                    </NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item 
+                      href={settingsItems[3].href}
+                      className="settings-dropdown-item"
+                    >
+                      <span 
+                        className="dropdown-item-icon"
+                        style={{ color: settingsItems[3].iconColor }}
+                      >
+                        {settingsItems[3].icon}
+                      </span>
+                      <span className="dropdown-item-label">{settingsItems[3].label}</span>
+                    </NavDropdown.Item>
+                  </NavDropdown>
+                </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>

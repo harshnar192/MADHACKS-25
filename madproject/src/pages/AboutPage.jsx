@@ -6,19 +6,20 @@ import './AboutPage.css';
 function AboutPage() {
 
   return (
-    <Container className="py-4 about-page">
+    <Container fluid className="py-4 about-page">
       <div className="about-hero-section">
         <div className="hero-icon">💎</div>
-        <h1 className="hero-title">Clarity</h1>
-        <p className="hero-subtitle muted-text">Your Emotional Spending Coach</p>
+        <h1 className="hero-title">Pulse</h1>
+        <p className="hero-subtitle muted-text">Take Control of Your Emotional Spending</p>
       </div>
 
       <div className="description-intro-section">
         <WidgetCard accent="primary">
           <p className="intro-text">
-            Clarity helps you understand and manage your emotional spending by connecting 
-            your financial decisions with your emotional state. Track your mood, identify 
-            spending triggers, and develop healthier financial habits.
+            Ever wonder why you spend money when you're stressed, tired, or just feeling down? 
+            Pulse reveals the hidden connection between your emotions and your wallet. Get real-time 
+            insights into your spending patterns, discover what triggers your impulse purchases, 
+            and take control of your finances with personalized coaching that actually works.
           </p>
         </WidgetCard>
       </div>
@@ -34,8 +35,9 @@ function AboutPage() {
               interactive={true}
             >
               <p className="feature-description muted-text">
-                Discover patterns in your spending behavior and identify emotional triggers 
-                that lead to unnecessary purchases. Get personalized insights about your financial habits.
+                Unlock powerful insights into your spending psychology. See exactly how your mood 
+                affects your wallet with beautiful visualizations and AI-powered analysis that 
+                reveals patterns you never noticed before.
               </p>
             </WidgetCard>
           </Col>
@@ -48,8 +50,9 @@ function AboutPage() {
               interactive={true}
             >
               <p className="feature-description muted-text">
-                Log how you're feeling and track your spending decisions in real-time 
-                to build awareness around emotional spending.
+                Capture your emotional state at the moment of purchase. Build self-awareness 
+                and break the cycle of unconscious spending by understanding the "why" behind 
+                every transaction.
               </p>
             </WidgetCard>
           </Col>
@@ -62,8 +65,9 @@ function AboutPage() {
               interactive={true}
             >
               <p className="feature-description muted-text">
-                View comprehensive spending overviews and receive personalized insights 
-                about your financial habits and progress.
+                Get a complete picture of your financial health with smart summaries that 
+                highlight overspending, category trends, and actionable recommendations 
+                tailored to your unique spending style.
               </p>
             </WidgetCard>
           </Col>
@@ -76,8 +80,9 @@ function AboutPage() {
               interactive={true}
             >
               <p className="feature-description muted-text">
-                Set and track your financial goals while identifying emotional blockers 
-                that prevent you from achieving them.
+                Set meaningful financial goals and track your progress with AI coaching 
+                that helps you overcome the emotional barriers standing between you and 
+                your financial freedom.
               </p>
             </WidgetCard>
           </Col>
@@ -90,8 +95,9 @@ function AboutPage() {
               interactive={true}
             >
               <p className="feature-description muted-text">
-                View all your bank transactions and see how income and expenses 
-                flow through your accounts.
+                See all your transactions in one place, automatically categorized and 
+                tagged with emotional context. Understand your complete financial picture 
+                at a glance.
               </p>
             </WidgetCard>
           </Col>
@@ -106,8 +112,9 @@ function AboutPage() {
               <div className="step-number">1</div>
               <h3 className="step-title">Track Your Spending</h3>
               <p className="step-description muted-text">
-                Log purchases and note how you were feeling when you made them. 
-                Use check-ins to capture your emotional state.
+                Simply log your purchases and how you felt in that moment. Whether you're 
+                stressed, happy, tired, or anxious—Pulse captures it all to build your 
+                personalized spending profile.
               </p>
             </div>
           </Col>
@@ -116,8 +123,9 @@ function AboutPage() {
               <div className="step-number">2</div>
               <h3 className="step-title">Identify Patterns</h3>
               <p className="step-description muted-text">
-                Clarity analyzes your data to reveal emotional triggers and spending patterns. 
-                Discover what drives your purchasing decisions.
+                Pulse's AI analyzes your spending patterns in real-time, uncovering the emotional 
+                triggers you never knew existed. See exactly when and why you overspend—whether 
+                it's stress, peer pressure, or late-night fatigue.
               </p>
             </div>
           </Col>
@@ -126,8 +134,9 @@ function AboutPage() {
               <div className="step-number">3</div>
               <h3 className="step-title">Get Personalized Insights</h3>
               <p className="step-description muted-text">
-                Receive actionable advice to help you make better financial decisions. 
-                Set goals and track your progress over time.
+                Get personalized, AI-powered coaching that adapts to your spending patterns. 
+                Receive real-time alerts, smart suggestions, and proven strategies to help 
+                you build lasting financial wellness.
               </p>
             </div>
           </Col>
@@ -139,7 +148,8 @@ function AboutPage() {
           <div className="cta-content">
             <h3 className="cta-title">Start Tracking Your Emotional Spending</h3>
             <p className="cta-text muted-text">
-              Use Clarity to understand your emotional spending patterns and develop healthier financial habits.
+              Join thousands who've transformed their relationship with money. Stop the cycle of 
+              impulse buying and start making financial decisions you'll actually feel good about tomorrow.
             </p>
             <div className="cta-buttons">
               <Link to="/check-in">

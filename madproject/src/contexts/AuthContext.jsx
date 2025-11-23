@@ -60,7 +60,7 @@ export function AuthProvider({ children }) {
       return true;
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+    return false;
     }
   };
 
