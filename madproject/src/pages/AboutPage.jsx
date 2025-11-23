@@ -9,14 +9,14 @@ function AboutPage() {
     <Container className="py-4 about-page">
       <div className="about-hero-section">
         <div className="hero-icon">💎</div>
-        <h1 className="hero-title">Clarity</h1>
+        <h1 className="hero-title">Pulse</h1>
         <p className="hero-subtitle muted-text">Your Emotional Spending Coach</p>
       </div>
 
       <div className="description-intro-section">
         <WidgetCard accent="primary">
           <p className="intro-text">
-            Clarity helps you understand and manage your emotional spending by connecting 
+            Pulse helps you understand and manage your emotional spending by connecting 
             your financial decisions with your emotional state. Track your mood, identify 
             spending triggers, and develop healthier financial habits.
           </p>

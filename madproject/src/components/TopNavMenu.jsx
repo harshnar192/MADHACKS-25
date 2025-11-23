@@ -63,7 +63,7 @@ function TopNavMenu() {
             onClick={() => setExpanded(false)}
           >
             <span className="brand-icon">💎</span>
-            Clarity
+            Pulse
           </NavLink>
           
           <Navbar.Toggle aria-controls="basic-navbar-nav" className="navbar-toggle-custom" />
