@@ -43,6 +43,7 @@ EMOTIONAL PATTERNS DETECTED:
 {PATTERNS}
 
 Generate a spoken summary (5-7 sentences) that:
+0. Each sentence should start with "{(emotion)} + sentence" where emotion = {happy, sad, angry, excited, calm, nervous, confident, surprised, satisfied, delighted, scared, worried, upset, frustrated, depressed, empathetic, embarrassed, disgusted, moved, proud, relaxed, grateful, curious, sarcastic} 
 1. States total spending and goal progress
 2. Highlights the most important emotional pattern
 3. Calls out invisible spending if significant
