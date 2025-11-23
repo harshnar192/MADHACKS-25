@@ -120,6 +120,26 @@ export async function checkHealth() {
 }
 
 /**
+ * Get impulsive purchases with mood data from the backend
+ * @returns {Promise<Object>} Impulsive purchases data with moods
+ */
+export async function getImpulsivePurchases() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/impulsive`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch impulsive purchases: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching impulsive purchases:', error);
+    throw error;
+  }
+}
+
+/**
  * Transcribe audio blob to text using Fish Audio backend service
  * @param {Blob} audioBlob - The audio blob to transcribe
  * @param {string} duration - Recording duration
@@ -131,9 +151,6 @@ export async function transcribeAudio(audioBlob, duration = '0') {
     formData.append('audio', audioBlob, 'recording.webm');
     formData.append('duration', duration.toString());
 
-    console.log('🎤 Sending audio to backend for transcription...');
-    console.log('Audio size:', audioBlob.size, 'bytes');
-
     const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
       method: 'POST',
       body: formData,
@@ -144,8 +161,6 @@ export async function transcribeAudio(audioBlob, duration = '0') {
     }
 
     const result = await response.json();
-    console.log('✅ Transcription successful:', result.text);
-    
     return result.text;
   } catch (error) {
     console.error('Error transcribing audio:', error);

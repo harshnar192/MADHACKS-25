@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
-import { getBankTransactions } from '../services/api';
+import { useLocation } from 'react-router-dom';
+import { getBankTransactions, getImpulsivePurchases } from '../services/api';
 import './TransactionsPage.css';
 
 // Helper function to get icon based on merchant/category
@@ -47,34 +48,71 @@ function formatCategory(category) {
 }
 
 function TransactionsPage() {
+  const location = useLocation();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [highlightMood, setHighlightMood] = useState(null);
+
+  useEffect(() => {
+    // Get mood filter from navigation state
+    if (location.state?.highlightMood || location.state?.filterByMood) {
+      setHighlightMood(location.state.highlightMood || location.state.filterByMood);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     async function loadTransactions() {
       try {
         setLoading(true);
-        const data = await getBankTransactions();
         
-        // Format and sort transactions (newest first)
-        const formattedTransactions = data.transactions
-          .map(tx => ({
-            id: tx.id,
-            merchant: tx.merchant,
-            amount: tx.amount,
-            category: tx.category,
-            date: tx.date,
-            datetime: tx.datetime,
-            dayOfWeek: tx.day_of_week,
-            description: tx.description,
-            icon: getIconForMerchant(tx.merchant, tx.category),
-            formattedDate: formatDate(tx.date),
-            formattedCategory: formatCategory(tx.category)
-          }))
-          .sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-        
-        setTransactions(formattedTransactions);
+        // If we have a mood filter, load from impulsive purchases
+        if (highlightMood) {
+          const impulsiveData = await getImpulsivePurchases();
+          const filteredTransactions = impulsiveData.transactions
+            .filter(tx => (tx.mood || 'neutral').toLowerCase() === highlightMood.toLowerCase())
+            .map(tx => ({
+              id: tx.id,
+              merchant: tx.merchant,
+              amount: tx.amount,
+              category: tx.category,
+              date: tx.date,
+              datetime: tx.datetime,
+              dayOfWeek: tx.day_of_week,
+              description: tx.description,
+              mood: tx.mood,
+              icon: getIconForMerchant(tx.merchant, tx.category),
+              formattedDate: formatDate(tx.date),
+              formattedCategory: formatCategory(tx.category),
+              isHighlighted: true
+            }))
+            .sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+          
+          setTransactions(filteredTransactions);
+        } else {
+          // Load all transactions
+          const data = await getBankTransactions();
+          
+          // Format and sort transactions (newest first)
+          const formattedTransactions = data.transactions
+            .map(tx => ({
+              id: tx.id,
+              merchant: tx.merchant,
+              amount: tx.amount,
+              category: tx.category,
+              date: tx.date,
+              datetime: tx.datetime,
+              dayOfWeek: tx.day_of_week,
+              description: tx.description,
+              icon: getIconForMerchant(tx.merchant, tx.category),
+              formattedDate: formatDate(tx.date),
+              formattedCategory: formatCategory(tx.category),
+              isHighlighted: false
+            }))
+            .sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+          
+          setTransactions(formattedTransactions);
+        }
       } catch (err) {
         console.error('Failed to load transactions:', err);
         setError('Failed to load transactions. Please try again later.');
@@ -84,7 +122,7 @@ function TransactionsPage() {
     }
 
     loadTransactions();
-  }, []);
+  }, [highlightMood]);
 
   // Group transactions by date
   const groupedTransactions = transactions.reduce((groups, tx) => {
@@ -96,11 +134,35 @@ function TransactionsPage() {
     return groups;
   }, {});
 
+  // Format mood name for display
+  const formatMoodName = (mood) => {
+    if (!mood) return '';
+    return mood.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <Container className="py-4 transactions-page">
       <div className="page-header mb-4">
         <h2 className="text-primary mb-2">Transactions</h2>
-        <p className="muted-text">View all your spending transactions ({transactions.length} total)</p>
+        {highlightMood ? (
+          <p className="muted-text">
+            Showing {transactions.length} {formatMoodName(highlightMood)} purchases
+            <button 
+              className="btn btn-sm btn-link text-primary ms-2" 
+              onClick={() => {
+                setHighlightMood(null);
+                window.history.replaceState({}, '', '/transactions');
+              }}
+              style={{ padding: 0, textDecoration: 'underline', border: 'none', background: 'none' }}
+            >
+              (Show all)
+            </button>
+          </p>
+        ) : (
+          <p className="muted-text">View all your spending transactions ({transactions.length} total)</p>
+        )}
       </div>
 
       <div className="transactions-container">
@@ -121,13 +183,23 @@ function TransactionsPage() {
                   <span className="date-count">{txs.length} {txs.length === 1 ? 'transaction' : 'transactions'}</span>
                 </div>
                 {txs.map((tx) => (
-                  <div key={tx.id} className="transaction-item">
+                  <div 
+                    key={tx.id} 
+                    className={`transaction-item ${tx.isHighlighted ? 'transaction-highlighted' : ''}`}
+                  >
                     <div className="transaction-left">
                       <div className="transaction-icon-wrapper">
                         <span className="transaction-icon">{tx.icon}</span>
                       </div>
                       <div className="transaction-info">
-                        <div className="transaction-merchant">{tx.merchant}</div>
+                        <div className="transaction-merchant">
+                          {tx.merchant}
+                          {tx.mood && (
+                            <span className="transaction-mood-badge">
+                              {formatMoodName(tx.mood)}
+                            </span>
+                          )}
+                        </div>
                         <div className="transaction-details">
                           <span className="transaction-category">{tx.formattedCategory}</span>
                           {tx.dayOfWeek && <span className="transaction-day"> • {tx.dayOfWeek}</span>}

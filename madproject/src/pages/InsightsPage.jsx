@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import WidgetCard from '../components/WidgetCard';
-import EmotionTag from '../components/EmotionTag';
 import EmotionPieChart from '../components/EmotionPieChart';
 import TransactionList from '../components/TransactionList';
 import { useData } from '../contexts/DataContext';
@@ -10,14 +9,15 @@ import './InsightsPage.css';
 
 function InsightsPage() {
   const navigate = useNavigate();
-  const { emotionalSpending, emotionBreakdown, invisibleSpending } = useData();
-  const [selectedEmotion, setSelectedEmotion] = useState(null);
-
-  const handleEmotionClick = (emotion) => {
-    setSelectedEmotion(emotion);
-    // TODO: Navigate to detailed view or show more info
-  };
-
+  const { 
+    emotionalSpending, 
+    emotionBreakdown, 
+    invisibleSpending,
+    moodBreakdown,
+    loadingImpulsive,
+    impulsivePurchases,
+    weeklySummary
+  } = useData();
   const handleCardClick = (destination) => {
     navigate(destination);
   };
@@ -42,34 +42,43 @@ function InsightsPage() {
               onClick={() => handleCardClick('/summary')}
             >
               <div className="emotional-spending-content">
-                <div className="spending-amount number-display">${emotionalSpending}</div>
+                <div className="spending-amount number-display">
+                  ${loadingImpulsive ? '0.00' : (emotionalSpending || 0).toFixed(2)}
+                </div>
                 
-                {/* Pie Chart */}
+                {/* Pie Chart - ALWAYS use mood data from impulsive.json */}
                 <div className="pie-chart-wrapper">
-                  <EmotionPieChart data={emotionBreakdown} />
+                  {loadingImpulsive ? (
+                    <div className="text-center py-5">
+                      <p className="muted-text">Loading mood data...</p>
+                    </div>
+                  ) : moodBreakdown.length > 0 ? (
+                    <EmotionPieChart moodData={moodBreakdown} />
+                  ) : impulsivePurchases.length === 0 ? (
+                    <div className="text-center py-5">
+                      <p className="muted-text">Unable to load impulsive purchases data.</p>
+                      <p className="muted-text" style={{ fontSize: '12px', marginTop: '8px' }}>
+                        Please ensure the server is running and the /api/impulsive endpoint is available.
+                      </p>
+                </div>
+                  ) : (
+                    <div className="text-center py-5">
+                      <p className="muted-text">No mood data available from impulsive purchases</p>
+                    </div>
+                  )}
                 </div>
                 
-                <div className="emotion-tags-row">
-                  {emotionBreakdown.map((emotion, index) => (
-                    <div
-                      key={index}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEmotionClick(emotion);
-                      }}
-                      className={selectedEmotion?.label === emotion.label ? 'selected' : ''}
-                    >
-                      <EmotionTag
-                        label={emotion.label}
-                        percentage={emotion.percentage}
-                        color={emotion.color}
-                      />
-                    </div>
-                  ))}
-                </div>
                 <div className="suggestion-box">
                   <p className="suggestion-text muted-text">
-                    💡 Most of your emotional spending happens when you're stressed. Try taking a 5-minute break before making purchases.
+                    💡 {loadingImpulsive ? (
+                      'Loading insights...'
+                    ) : moodBreakdown.length > 0 && moodBreakdown[0] ? (
+                      `Most of your emotional spending happens when you're ${moodBreakdown[0].mood}. Try taking a 5-minute break before making purchases.`
+                    ) : impulsivePurchases.length === 0 ? (
+                      'Unable to load data. Please restart the server to enable the /api/impulsive endpoint.'
+                    ) : (
+                      'No mood data available from impulsive purchases.'
+                    )}
                   </p>
                 </div>
               </div>
@@ -101,13 +110,34 @@ function InsightsPage() {
                 onClick={() => handleCardClick('/summary')}
               >
                 <div className="weekly-summary-content">
+                  {loadingImpulsive ? (
+                    <p className="summary-text text-primary">Loading summary...</p>
+                  ) : (
+                    <>
                   <p className="summary-text text-primary">
-                    You're <span className="highlight-text">$320 behind</span> your goal.
+                        {impulsivePurchases.length > 0 ? (
+                          <>You've made <span className="highlight-text">{impulsivePurchases.length} impulse purchases</span> this month.</>
+                        ) : (
+                          <>You're <span className="highlight-text">$320 behind</span> your goal.</>
+                        )}
                   </p>
                   <ul className="trigger-list">
-                    <li className="muted-text">🕐 Late evening purchases increased by 40%</li>
-                    <li className="muted-text">😓 Stress triggers accounted for 50% of spending</li>
+                        {weeklySummary.lateEveningPercentage > 0 && (
+                          <li className="muted-text">
+                            🕐 Late evening purchases (8pm-6am) account for {weeklySummary.lateEveningPercentage}% of your spending
+                          </li>
+                        )}
+                        {weeklySummary.topMoodTrigger && (
+                          <li className="muted-text">
+                            😓 {weeklySummary.topMoodTrigger.charAt(0).toUpperCase() + weeklySummary.topMoodTrigger.slice(1).replace('_', ' ')} triggers accounted for {weeklySummary.topMoodPercentage}% of spending
+                          </li>
+                        )}
+                        {!weeklySummary.topMoodTrigger && moodBreakdown.length === 0 && (
+                          <li className="muted-text">No mood data available</li>
+                        )}
                   </ul>
+                    </>
+                  )}
                   <Link to="/summary" onClick={(e) => e.stopPropagation()}>
                     <Button className="btn-primary-custom mt-3" style={{ width: '100%' }}>
                       View Detailed Summary →
