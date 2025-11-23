@@ -2382,7 +2382,7 @@
       "status": "Completed",
       "type": "Debit",
       "authorization_code": "AUTH760256",
-      "balance_after": -3831.0
+      "balance_after": -3831
     },
     {
       "id": 109,
@@ -2937,7 +2937,7 @@
     {
       "id": 134,
       "transaction_id": "TXN20241203006",
-      "amount": 3.0,
+      "amount": 3,
       "merchant": "7-Eleven",
       "category": "snacks",
       "date": "2024-12-03",
@@ -4015,7 +4015,7 @@
     {
       "id": 183,
       "transaction_id": "TXN20241109018",
-      "amount": 28.0,
+      "amount": 28,
       "merchant": "Bar & Grill",
       "category": "alcohol",
       "date": "2024-11-09",
