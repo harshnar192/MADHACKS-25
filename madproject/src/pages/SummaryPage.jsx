@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Container, Row, Col, ProgressBar, Button, Spinner, Alert } from 'react-bootstrap';
 import InsightCard from '../components/InsightCard';
 import { useData } from '../contexts/DataContext';
@@ -9,14 +9,17 @@ import {
   weeklyInsight,
   coachingText 
 } from '../mockData';
-import { generateSummary } from '../services/api';
+import { generateSummary, ttsText } from '../services/api';
 import './SummaryPage.css';
 
 function SummaryPage() {
   const [aiCoaching, setAiCoaching] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [audioBuffer, setAudioBuffer] = useState(null); 
   const [error, setError] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState('supportive_friend');
+  const [audioUrl, setAudioUrl] = useState(null); 
+  const audioRef = useRef(null); 
 
   const handleGenerateAISummary = async () => {
     setIsGenerating(true);
@@ -60,7 +63,13 @@ function SummaryPage() {
       };
 
       const result = await generateSummary(selectedPersona, data);
+      // const result = {"summary": "Good morning world! Good morning friend!"};
       setAiCoaching(result.summary);
+      console.log(result.summary); 
+      const blob = await ttsText(result.summary); 
+      const url = URL.createObjectURL(blob); 
+      setAudioUrl(url); 
+      console.log(audioUrl); 
     } catch (err) {
       console.error('Failed to generate AI summary:', err);
       setError('Unable to generate AI coaching summary. The backend service may be unavailable.');
@@ -79,6 +88,12 @@ function SummaryPage() {
   const coachingText = checkIns.length > 0
     ? `You've logged ${checkIns.length} check-in${checkIns.length > 1 ? 's' : ''} with a total of $${totalSpent.toLocaleString()} in emotional spending. Your primary triggers are: ${emotionalTriggers.sort((a, b) => b.count - a.count).map(t => `${t.trigger} (${t.count})`).join(', ')}. Consider setting up reminders to pause before making purchases when you notice these patterns.`
     : "Start logging your spending and emotions to get personalized insights and coaching.";
+
+  const handlePlay = () => {
+    if (audioRef.current) {
+      audioRef.current.play(); 
+    }
+  }
 
   return (
     <Container className="py-4 summary-page">
@@ -198,6 +213,13 @@ function SummaryPage() {
             <p className="coaching-text muted-text">
               {aiCoaching || coachingText}
             </p>
+
+            {audioUrl && (
+              <>
+                <button onClick={handlePlay}>▶ Play</button>
+                <audio ref={audioRef} src={audioUrl} />
+              </>
+            )}
 
             <div className="mt-3">
               <Button
