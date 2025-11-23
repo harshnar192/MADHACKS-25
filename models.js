@@ -46,7 +46,7 @@ const emotionalTransactionSchema = new mongoose.Schema({
   raw_emotion: String,
   emotion: {
     type: String,
-    enum: ['stress', 'tired', 'deserved', 'guilt', 'regret', 'happy', 'anxious', 'neutral'],
+    enum: ['stressed', 'tired', 'deserved', 'guilt', 'regret', 'happy', 'anxious', 'neutral', 'peer_pressure', 'bored', 'lonely', 'excited', 'sad'],
     required: true,
   },
   context: String, // What the user said

@@ -1,43 +1,57 @@
 import { useState } from 'react';
-import { Container, Row, Col, ProgressBar, Button, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Button, Spinner, Alert } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import InsightCard from '../components/InsightCard';
 import { useData } from '../contexts/DataContext';
-import { 
-  spendingByCategory, 
-  totalSpent, 
-  emotionalTriggers, 
-  weeklyInsight,
-  coachingText 
-} from '../mockData';
 import { generateSummary } from '../services/api';
 import './SummaryPage.css';
 
 function SummaryPage() {
+  const navigate = useNavigate();
   const [aiCoaching, setAiCoaching] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState('supportive_friend');
+  
+  // Helper to convert trigger name back to mood format
+  const getMoodFromTrigger = (trigger) => {
+    return trigger.toLowerCase().replace(' ', '_');
+  };
+  
+  // Handle clicking on trigger count to navigate to transactions
+  const handleTriggerClick = (trigger) => {
+    const mood = getMoodFromTrigger(trigger);
+    navigate('/transactions', { 
+      state: { 
+        highlightMood: mood,
+        filterByMood: mood 
+      } 
+    });
+  };
 
   const handleGenerateAISummary = async () => {
     setIsGenerating(true);
     setError(null);
 
     try {
-      // Prepare data for the backend
+      // Prepare data for the backend using real impulsive purchase data
+      const totalSpending = emotionalSpending || totalSpent || 0;
+      const categoryData = spendingByCategory.reduce((acc, item) => {
+        acc[item.category.toLowerCase().replace(' ', '_')] = item.amount;
+        return acc;
+      }, {});
+      
       const data = {
         goals: [
           { description: "Keep food delivery under $75/week" },
           { description: "Limit bar spending to $100/week" }
         ],
         spending: {
-          total_spent: totalSpent,
-          by_category: spendingByCategory.reduce((acc, item) => {
-            acc[item.category.toLowerCase()] = item.amount;
-            return acc;
-          }, {})
+          total_spent: totalSpending,
+          by_category: categoryData
         },
         goalProgress: spendingByCategory.reduce((acc, item) => {
-          acc[item.category.toLowerCase()] = {
+          acc[item.category.toLowerCase().replace(' ', '_')] = {
             goal: 500,
             actual: item.amount,
             percent: item.percentage
@@ -46,14 +60,14 @@ function SummaryPage() {
         }, {}),
         voiceEntries: [],
         invisibleSpending: {
-          unlogged_transactions: 5,
-          unlogged_amount: 150
+          unlogged_transactions: checkIns.filter(tx => (tx.amountValue || 0) < 50).length,
+          unlogged_amount: checkIns.filter(tx => (tx.amountValue || 0) < 50).reduce((sum, tx) => sum + (tx.amountValue || 0), 0)
         },
         patterns: emotionalTriggers.reduce((acc, trigger, idx) => {
           acc[`pattern_${idx}`] = {
             pattern: trigger.trigger,
             occurrences: trigger.count,
-            total_cost: 50 * trigger.count
+            total_cost: (emotionalSpending || 0) * (trigger.count / (checkIns.length || 1)) || 50 * trigger.count
           };
           return acc;
         }, {})
@@ -68,7 +82,14 @@ function SummaryPage() {
       setIsGenerating(false);
     }
   };
-  const { spendingByCategory, totalSpent, emotionalTriggers, checkIns } = useData();
+  const { 
+    spendingByCategory, 
+    totalSpent, 
+    emotionalTriggers, 
+    checkIns,
+    isLoading,
+    emotionalSpending
+  } = useData();
   
   // Calculate weekly insight based on data
   const weeklyInsight = checkIns.length > 0 
@@ -77,8 +98,11 @@ function SummaryPage() {
   
   // Generate coaching text based on actual data
   const coachingText = checkIns.length > 0
-    ? `You've logged ${checkIns.length} check-in${checkIns.length > 1 ? 's' : ''} with a total of $${totalSpent.toLocaleString()} in emotional spending. Your primary triggers are: ${emotionalTriggers.sort((a, b) => b.count - a.count).map(t => `${t.trigger} (${t.count})`).join(', ')}. Consider setting up reminders to pause before making purchases when you notice these patterns.`
+    ? `You've logged ${checkIns.length} emotional purchase${checkIns.length > 1 ? 's' : ''} with a total of $${(emotionalSpending || totalSpent || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} in emotional spending. ${emotionalTriggers.length > 0 ? `Your primary triggers are: ${emotionalTriggers.slice(0, 3).map(t => `${t.trigger} (${t.count})`).join(', ')}.` : ''} Consider setting up reminders to pause before making purchases when you notice these patterns.`
     : "Start logging your spending and emotions to get personalized insights and coaching.";
+  
+  // Get top overspending category
+  const topCategory = spendingByCategory.length > 0 ? spendingByCategory[0] : null;
 
   return (
     <Container className="py-4 summary-page">
@@ -93,37 +117,38 @@ function SummaryPage() {
         <Col md={6}>
           <InsightCard 
             title="Spending Summary"
-            subtitle={`Total: $${totalSpent.toLocaleString()}`}
+            subtitle={isLoading ? "Loading..." : `Total: $${(emotionalSpending || totalSpent || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             accent="primary"
           >
             <div className="spending-breakdown">
-              {spendingByCategory.length > 0 ? (
-                spendingByCategory.map((item, index) => (
-                  <div key={index} className="category-item">
-                    <div className="category-header">
-                      <span className="category-name text-primary">{item.category}</span>
-                      <span className="category-amount text-primary">${item.amount.toLocaleString()}</span>
+              {isLoading ? (
+                <p className="muted-text">Loading spending data...</p>
+              ) : spendingByCategory.length > 0 ? (
+                <>
+                  {topCategory && topCategory.percentage > 50 && (
+                    <div className="alert alert-warning mb-3" style={{ 
+                      fontSize: '13px', 
+                      padding: '10px 14px', 
+                      backgroundColor: 'rgba(251, 191, 36, 0.15)', 
+                      border: '1px solid rgba(251, 191, 36, 0.4)', 
+                      borderRadius: '6px',
+                      color: '#ffffff'
+                    }}>
+                      ⚠️ <strong style={{ color: '#ffffff' }}>Overspending Alert:</strong> You're spending {topCategory.percentage.toFixed(1)}% of your total on <strong style={{ color: '#ffffff' }}>{topCategory.category}</strong> (${topCategory.amount.toFixed(2)})
                     </div>
-                    <ProgressBar 
-                      now={item.percentage} 
-                      className="category-progress"
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                        height: '8px',
-                        borderRadius: '4px'
-                      }}
-                    >
-                      <ProgressBar 
-                        now={item.percentage} 
-                        variant="primary"
-                        style={{
-                          transition: 'width 0.3s ease'
-                        }}
-                      />
-                    </ProgressBar>
-                    <span className="category-percentage muted-text">{item.percentage.toFixed(1)}%</span>
-                  </div>
-                ))
+                  )}
+                  {spendingByCategory.map((item, index) => (
+                    <div key={index} className="category-item">
+                      <div className="category-header">
+                        <span className="category-name">{item.category}</span>
+                        <div className="category-right">
+                          <span className="category-amount">${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span className="category-percentage">{item.percentage.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
               ) : (
                 <p className="muted-text">No spending data yet. Add a check-in to see your spending breakdown.</p>
               )}
@@ -139,10 +164,20 @@ function SummaryPage() {
             accent="danger"
           >
             <div className="emotional-insights">
+              {isLoading ? (
+                <p className="muted-text">Loading emotional triggers...</p>
+              ) : emotionalTriggers.length > 0 ? (
+                <>
               {emotionalTriggers.map((item, index) => (
                 <div key={index} className="trigger-item">
-                  <span className="trigger-name text-primary">{item.trigger}</span>
-                  <span className="trigger-count number-display">{item.count}</span>
+                  <span className="trigger-name">{item.trigger}</span>
+                  <span 
+                    className="trigger-count trigger-count-clickable" 
+                    onClick={() => handleTriggerClick(item.trigger)}
+                    title={`Click to view ${item.count} ${item.trigger.toLowerCase()} purchases`}
+                  >
+                    {item.count}
+                  </span>
                 </div>
               ))}
               <div className="insight-highlight">
@@ -150,6 +185,10 @@ function SummaryPage() {
                   <strong>{weeklyInsight}</strong>
                 </p>
               </div>
+                </>
+              ) : (
+                <p className="muted-text">No emotional trigger data available.</p>
+              )}
             </div>
           </InsightCard>
         </Col>

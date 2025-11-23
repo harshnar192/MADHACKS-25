@@ -35,16 +35,18 @@ function LoginPage() {
       return;
     }
 
-    // Mock login - TODO: Replace with real API
-    setTimeout(() => {
-      const success = login(formData.email, formData.password);
+    try {
+      const success = await login(formData.email, formData.password);
       if (success) {
         navigate('/');
       } else {
         setError('Invalid email or password');
       }
+    } catch (error) {
+      setError(error.message || 'Login failed. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   return (

@@ -20,13 +20,18 @@ function extractEmotion(explanation) {
 }
 
 // Helper function to get icon based on merchant/category
-function getIconForMerchant(merchant) {
-  const lower = merchant.toLowerCase();
-  if (lower.includes('starbucks') || lower.includes('coffee') || lower.includes('cafe')) return '☕';
-  if (lower.includes('amazon') || lower.includes('online')) return '📦';
-  if (lower.includes('uber') || lower.includes('lyft') || lower.includes('food') || lower.includes('eats')) return '🍔';
+function getIconForMerchant(merchant, category = '') {
+  const lower = (merchant || '').toLowerCase();
+  const catLower = (category || '').toLowerCase();
+  
+  if (lower.includes('starbucks') || lower.includes('coffee') || lower.includes('cafe') || lower.includes("peet's") || catLower === 'coffee') return '☕';
+  if (lower.includes('amazon') || lower.includes('online') || catLower === 'shopping') return '📦';
+  if (lower.includes('uber') || lower.includes('lyft') || lower.includes('doordash') || lower.includes('postmates') || lower.includes('food') || lower.includes('eats') || catLower === 'food_delivery') return '🍔';
   if (lower.includes('nike') || lower.includes('shoe') || lower.includes('clothing')) return '👟';
-  if (lower.includes('snack') || lower.includes('convenience')) return '🍫';
+  if (lower.includes('snack') || lower.includes('convenience') || lower.includes('vending') || lower.includes('walgreens') || lower.includes('7-eleven') || lower.includes('dunkin') || catLower === 'snacks') return '🍫';
+  if (catLower === 'alcohol' || lower.includes('bar') || lower.includes('lounge') || lower.includes('liquor')) return '🍷';
+  if (catLower === 'groceries' || lower.includes('whole foods') || lower.includes('target')) return '🛒';
+  if (catLower === 'dining_out' || lower.includes('mcdonald') || lower.includes('taco bell') || lower.includes('panera')) return '🍽️';
   return '💰';
 }
 
@@ -41,7 +46,9 @@ export function DataProvider({ children }) {
     async function loadData() {
       try {
         setIsLoading(true);
+        console.log('Loading emotional transactions...');
         const response = await getEmotionalTransactions('default', 100);
+        console.log('Received response:', response);
         
         // Transform MongoDB documents to the format expected by UI
         const transformedData = (response.transactions || []).map(tx => ({
@@ -56,6 +63,7 @@ export function DataProvider({ children }) {
           timestamp: tx.entry_time
         }));
 
+        console.log(`Loaded ${transformedData.length} emotional transactions`);
         setCheckIns(transformedData);
         setError(null);
       } catch (err) {
@@ -68,9 +76,38 @@ export function DataProvider({ children }) {
     }
 
     loadData();
-  }, []);
+  }, []); // Load once on mount
 
-  // Calculate emotional spending breakdown
+  // Calculate mood breakdown from check-ins - based on FREQUENCY (count)
+  const moodBreakdown = useMemo(() => {
+    if (checkIns.length === 0) {
+      return [];
+    }
+
+    const moodCounts = {};
+    const moodAmounts = {};
+    
+    // Process ALL transactions from checkIns
+    checkIns.forEach(tx => {
+      const mood = (tx.emotion || 'neutral').toLowerCase();
+      moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amountValue || 0);
+    });
+
+    const totalCount = checkIns.length;
+
+    // Calculate percentage based on FREQUENCY (count), not amount
+    const breakdown = Object.keys(moodCounts).map(mood => ({
+      mood: mood,
+      percentage: Math.round((moodCounts[mood] / totalCount) * 100), // Based on count/frequency
+      count: moodCounts[mood],
+      amount: moodAmounts[mood]
+    })).sort((a, b) => b.count - a.count); // Sort by count, not amount
+    
+    return breakdown;
+  }, [checkIns]);
+
+  // Calculate emotional spending breakdown (legacy - from checkIns)
   const emotionBreakdown = useMemo(() => {
     const emotionCounts = {};
     const emotionAmounts = {};
@@ -122,6 +159,57 @@ export function DataProvider({ children }) {
     return checkIns.reduce((sum, checkIn) => sum + (checkIn.amountValue || 0), 0);
   }, [checkIns]);
 
+  // Calculate spending by mood (for bar chart)
+  const spendingByMood = useMemo(() => {
+    if (checkIns.length === 0) {
+      return [];
+    }
+
+    const moodAmounts = {};
+    const moodCounts = {};
+    
+    checkIns.forEach(tx => {
+      const mood = (tx.emotion || 'neutral').toLowerCase();
+      moodAmounts[mood] = (moodAmounts[mood] || 0) + (tx.amountValue || 0);
+      moodCounts[mood] = (moodCounts[mood] || 0) + 1;
+    });
+
+    return Object.keys(moodAmounts).map(mood => ({
+      mood: mood,
+      amount: moodAmounts[mood],
+      count: moodCounts[mood]
+    })).sort((a, b) => b.amount - a.amount);
+  }, [checkIns]);
+
+  // Calculate spending by category and mood
+  const spendingByCategoryMood = useMemo(() => {
+    if (checkIns.length === 0) {
+      return [];
+    }
+
+    const categoryMoodMap = {};
+    
+    checkIns.forEach(tx => {
+      const category = tx.category || 'other';
+      const mood = (tx.emotion || 'neutral').toLowerCase();
+      const key = `${category}_${mood}`;
+      
+      if (!categoryMoodMap[key]) {
+        categoryMoodMap[key] = {
+          category,
+          mood,
+          amount: 0,
+          count: 0
+        };
+      }
+      
+      categoryMoodMap[key].amount += tx.amountValue || 0;
+      categoryMoodMap[key].count += 1;
+    });
+
+    return Object.values(categoryMoodMap).sort((a, b) => b.amount - a.amount);
+  }, [checkIns]);
+
   // Calculate invisible spending (small purchases)
   const invisibleSpending = useMemo(() => {
     return checkIns
@@ -168,7 +256,7 @@ export function DataProvider({ children }) {
     }));
   }, [checkIns]);
 
-  // Calculate spending by category
+  // Calculate spending by category from checkIns
   const spendingByCategory = useMemo(() => {
     const categories = {};
     checkIns.forEach(checkIn => {
@@ -188,7 +276,7 @@ export function DataProvider({ children }) {
     })).sort((a, b) => b.amount - a.amount);
   }, [checkIns]);
 
-  // Calculate emotional triggers count
+  // Calculate emotional triggers count from checkIns
   const emotionalTriggers = useMemo(() => {
     const triggers = {};
     checkIns.forEach(checkIn => {
@@ -196,12 +284,39 @@ export function DataProvider({ children }) {
       triggers[emotion] = (triggers[emotion] || 0) + 1;
     });
 
-    return [
-      { trigger: 'Tired', count: triggers['Tired'] || 0 },
-      { trigger: 'Stress', count: triggers['Stress'] || 0 },
-      { trigger: 'Deserved', count: triggers['Deserved'] || 0 },
-    ];
+    return Object.entries(triggers)
+      .map(([trigger, count]) => ({ trigger, count }))
+      .sort((a, b) => b.count - a.count);
   }, [checkIns]);
+
+  // Calculate weekly summary stats from checkIns
+  const weeklySummary = useMemo(() => {
+    if (checkIns.length === 0) {
+      return {
+        lateEveningPercentage: 0,
+        topMoodTrigger: null,
+        topMoodPercentage: 0
+      };
+    }
+
+    // Calculate late evening purchases (8pm - 6am) from timestamps
+    const lateEvening = checkIns.filter(tx => {
+      if (!tx.timestamp) return false;
+      const date = new Date(tx.timestamp);
+      const hour = date.getHours();
+      return hour >= 20 || hour <= 6;
+    });
+    const lateEveningPercentage = Math.round((lateEvening.length / checkIns.length) * 100);
+
+    // Get top mood trigger
+    const topMood = moodBreakdown.length > 0 ? moodBreakdown[0] : null;
+
+    return {
+      lateEveningPercentage,
+      topMoodTrigger: topMood?.mood || null,
+      topMoodPercentage: topMood?.percentage || 0
+    };
+  }, [checkIns, moodBreakdown]);
 
   const value = {
     checkIns,
@@ -214,7 +329,12 @@ export function DataProvider({ children }) {
     emotionalTriggers,
     totalSpent: emotionalSpending,
     isLoading,
-    error
+    error,
+    // New mood-based data
+    moodBreakdown,
+    spendingByMood,
+    spendingByCategoryMood,
+    weeklySummary
   };
 
   return (

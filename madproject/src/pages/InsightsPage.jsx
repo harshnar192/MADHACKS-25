@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import WidgetCard from '../components/WidgetCard';
-import EmotionTag from '../components/EmotionTag';
 import EmotionPieChart from '../components/EmotionPieChart';
 import TransactionList from '../components/TransactionList';
 import { useData } from '../contexts/DataContext';
@@ -10,14 +9,15 @@ import './InsightsPage.css';
 
 function InsightsPage() {
   const navigate = useNavigate();
-  const { emotionalSpending, emotionBreakdown, invisibleSpending } = useData();
-  const [selectedEmotion, setSelectedEmotion] = useState(null);
-
-  const handleEmotionClick = (emotion) => {
-    setSelectedEmotion(emotion);
-    // TODO: Navigate to detailed view or show more info
-  };
-
+  const { 
+    emotionalSpending, 
+    emotionBreakdown, 
+    invisibleSpending,
+    moodBreakdown,
+    checkIns,
+    isLoading,
+    weeklySummary
+  } = useData();
   const handleCardClick = (destination) => {
     navigate(destination);
   };
@@ -42,34 +42,43 @@ function InsightsPage() {
               onClick={() => handleCardClick('/summary')}
             >
               <div className="emotional-spending-content">
-                <div className="spending-amount number-display">${emotionalSpending}</div>
+                <div className="spending-amount number-display">
+                  ${isLoading ? '0.00' : (emotionalSpending || 0).toFixed(2)}
+                </div>
                 
-                {/* Pie Chart */}
+                {/* Pie Chart - Shows mood data from emotional transactions */}
                 <div className="pie-chart-wrapper">
-                  <EmotionPieChart data={emotionBreakdown} />
+                  {isLoading ? (
+                    <div className="text-center py-5">
+                      <p className="muted-text">Loading mood data...</p>
+                    </div>
+                  ) : moodBreakdown.length > 0 ? (
+                    <EmotionPieChart moodData={moodBreakdown} />
+                  ) : checkIns.length === 0 ? (
+                    <div className="text-center py-5">
+                      <p className="muted-text">No emotional transactions yet.</p>
+                      <p className="muted-text" style={{ fontSize: '12px', marginTop: '8px' }}>
+                        Start adding check-ins to see your mood patterns!
+                      </p>
+                </div>
+                  ) : (
+                    <div className="text-center py-5">
+                      <p className="muted-text">No mood data available</p>
+                    </div>
+                  )}
                 </div>
                 
-                <div className="emotion-tags-row">
-                  {emotionBreakdown.map((emotion, index) => (
-                    <div
-                      key={index}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEmotionClick(emotion);
-                      }}
-                      className={selectedEmotion?.label === emotion.label ? 'selected' : ''}
-                    >
-                      <EmotionTag
-                        label={emotion.label}
-                        percentage={emotion.percentage}
-                        color={emotion.color}
-                      />
-                    </div>
-                  ))}
-                </div>
                 <div className="suggestion-box">
                   <p className="suggestion-text muted-text">
-                    💡 Most of your emotional spending happens when you're stressed. Try taking a 5-minute break before making purchases.
+                    💡 {isLoading ? (
+                      'Loading insights...'
+                    ) : moodBreakdown.length > 0 && moodBreakdown[0] ? (
+                      `Most of your emotional spending happens when you're ${moodBreakdown[0].mood}. Try taking a 5-minute break before making purchases.`
+                    ) : checkIns.length === 0 ? (
+                      'Start tracking your emotional spending to see personalized insights!'
+                    ) : (
+                      'Keep tracking to see your spending patterns.'
+                    )}
                   </p>
                 </div>
               </div>
@@ -101,13 +110,34 @@ function InsightsPage() {
                 onClick={() => handleCardClick('/summary')}
               >
                 <div className="weekly-summary-content">
+                  {isLoading ? (
+                    <p className="summary-text text-primary">Loading summary...</p>
+                  ) : (
+                    <>
                   <p className="summary-text text-primary">
-                    You're <span className="highlight-text">$320 behind</span> your goal.
+                        {checkIns.length > 0 ? (
+                          <>You've made <span className="highlight-text">{checkIns.length} emotional purchases</span> this month.</>
+                        ) : (
+                          <>Start tracking your emotional spending!</>
+                        )}
                   </p>
                   <ul className="trigger-list">
-                    <li className="muted-text">🕐 Late evening purchases increased by 40%</li>
-                    <li className="muted-text">😓 Stress triggers accounted for 50% of spending</li>
+                        {weeklySummary.lateEveningPercentage > 0 && (
+                          <li className="muted-text">
+                            🕐 Late evening purchases (8pm-6am) account for {weeklySummary.lateEveningPercentage}% of your spending
+                          </li>
+                        )}
+                        {weeklySummary.topMoodTrigger && (
+                          <li className="muted-text">
+                            😓 {weeklySummary.topMoodTrigger.charAt(0).toUpperCase() + weeklySummary.topMoodTrigger.slice(1).replace('_', ' ')} triggers accounted for {weeklySummary.topMoodPercentage}% of spending
+                          </li>
+                        )}
+                        {!weeklySummary.topMoodTrigger && moodBreakdown.length === 0 && (
+                          <li className="muted-text">No mood data available</li>
+                        )}
                   </ul>
+                    </>
+                  )}
                   <Link to="/summary" onClick={(e) => e.stopPropagation()}>
                     <Button className="btn-primary-custom mt-3" style={{ width: '100%' }}>
                       View Detailed Summary →

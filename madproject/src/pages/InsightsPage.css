@@ -55,6 +55,16 @@
   width: 100%;
 }
 
+.widget-item.widget-full {
+  grid-column: 1 / -1;
+}
+
+.chart-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* Emotional Spending Content - Minimalist */
 .emotional-spending-content {
   text-align: left;

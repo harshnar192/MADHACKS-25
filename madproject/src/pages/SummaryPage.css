@@ -6,58 +6,106 @@
   margin-bottom: 32px;
 }
 
+/* Ensure cards are aligned at the same level */
+.summary-page .row {
+  align-items: stretch;
+}
+
+.summary-page .row > [class*="col-"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-page .row > [class*="col-"] > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure both cards have same height and minimal spacing */
+.summary-page .insight-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-page .insight-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure alert text is white and readable */
+.alert-warning {
+  color: #ffffff !important;
+}
+
+.alert-warning strong {
+  color: #ffffff !important;
+}
+
 /* Spending Breakdown */
 .spending-breakdown {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .category-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .category-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.category-item:last-child .category-header {
+  border-bottom: none;
 }
 
 .category-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
+  color: #60a5fa; /* Light blue - easily readable */
+}
+
+.category-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .category-amount {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-}
-
-.category-progress {
-  width: 100%;
-  margin: 4px 0;
+  color: #ffffff; /* White for amounts */
 }
 
 .category-percentage {
-  font-size: 12px;
-  align-self: flex-end;
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 50px;
+  text-align: right;
+  color: #34d399; /* Bright green for percentages - pops out */
 }
 
 /* Emotional Insights */
 .emotional-insights {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
 }
 
 .trigger-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -68,17 +116,30 @@
 .trigger-name {
   font-size: 16px;
   font-weight: 500;
+  color: #fbbf24; /* Bright yellow/gold - pops out */
 }
 
 .trigger-count {
   font-size: 28px;
   font-weight: 700;
-  color: var(--accent-danger);
+  color: #f87171; /* Bright red/coral - easily readable */
+}
+
+.trigger-count-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.trigger-count-clickable:hover {
+  color: #ef4444; /* Darker red on hover */
+  transform: scale(1.1);
+  text-decoration: underline;
 }
 
 .insight-highlight {
-  margin-top: 16px;
-  padding: 16px;
+  margin-top: 12px;
+  padding: 12px;
   background-color: rgba(249, 115, 115, 0.1);
   border-left: 3px solid var(--accent-danger);
   border-radius: 8px;
@@ -88,11 +149,11 @@
   margin: 0;
   font-size: 15px;
   line-height: 1.6;
-  color: var(--text-primary);
+  color: #e0e7ff; /* Light purple/blue - readable */
 }
 
 .insight-text strong {
-  color: var(--accent-danger);
+  color: #fbbf24; /* Bright yellow/gold - pops out */
   font-weight: 600;
 }
 
@@ -101,6 +162,7 @@
   font-size: 15px;
   line-height: 1.8;
   margin: 0;
+  color: #d1d5db; /* Light gray - easily readable */
 }
 
 /* Responsive */

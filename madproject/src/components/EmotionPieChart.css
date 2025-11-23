@@ -28,6 +28,13 @@
   margin: 0;
 }
 
+.tooltip-count {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin: 4px 0 0 0;
+  font-style: italic;
+}
+
 /* Recharts legend customization */
 .recharts-legend-wrapper {
   padding-top: 20px !important;

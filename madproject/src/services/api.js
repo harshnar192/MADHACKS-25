@@ -1,6 +1,32 @@
 // API service for backend communication
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+// Token management
+const TOKEN_KEY = 'madhacks_auth_token';
+const USER_KEY = 'madhacks_user';
+
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function removeToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function getUser() {
+  const userStr = localStorage.getItem(USER_KEY);
+  return userStr ? JSON.parse(userStr) : null;
+}
+
+export function setUser(user) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
 /**
  * Parse a voice entry transcript using the backend AI
  * @param {string} transcript - The voice transcript to parse
@@ -227,9 +253,6 @@ export async function transcribeAudio(audioBlob, duration = '0') {
     formData.append('audio', audioBlob, 'recording.webm');
     formData.append('duration', duration.toString());
 
-    console.log('🎤 Sending audio to backend for transcription...');
-    console.log('Audio size:', audioBlob.size, 'bytes');
-
     const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
       method: 'POST',
       body: formData,
@@ -240,11 +263,138 @@ export async function transcribeAudio(audioBlob, duration = '0') {
     }
 
     const result = await response.json();
-    console.log('✅ Transcription successful:', result.text);
-    
     return result.text;
   } catch (error) {
     console.error('Error transcribing audio:', error);
+    throw error;
+  }
+}
+
+export async function loginUser(email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Login failed');
+    }
+
+    const data = await response.json();
+    
+    // Store token and user
+    if (data.token) {
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+}
+
+/**
+ * Sign up new user
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @param {string} name - User name
+ * @returns {Promise<Object>} User data and token
+ */
+export async function signupUser(email, password, name) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, name }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Signup failed');
+    }
+
+    const data = await response.json();
+    
+    // Store token and user
+    if (data.token) {
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error signing up:', error);
+    throw error;
+  }
+}
+
+/**
+ * Verify JWT token and get user data
+ * @returns {Promise<Object>} User data
+ */
+export async function verifyToken() {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      // Token is invalid, clear storage
+      removeToken();
+      throw new Error('Invalid or expired token');
+    }
+
+    const data = await response.json();
+    
+    // Update stored user data
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error verifying token:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get impulsive purchases (uses emotional transactions for now)
+ * @param {string} userId - User ID
+ * @returns {Promise<Object>} Impulsive purchases data
+ */
+export async function getImpulsivePurchases(userId = 'default') {
+  try {
+    // For now, return emotional transactions as impulsive purchases
+    const response = await getEmotionalTransactions(userId, 100);
+    return {
+      transactions: response.transactions || [],
+      total: response.transactions?.length || 0
+    };
+  } catch (error) {
+    console.error('Error fetching impulsive purchases:', error);
     throw error;
   }
 }

@@ -1,5 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { DataProvider } from './contexts/DataContext';
 import InsightsPage from './pages/InsightsPage';
 import CheckInPage from './pages/CheckInPage';
@@ -8,20 +7,12 @@ import VoicePage from './pages/VoicePage';
 import GoalsPage from './pages/GoalsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import AboutPage from './pages/AboutPage';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
 import TopNavMenu from './components/TopNavMenu';
 import BottomTabNav from './components/BottomTabNav';
 import './App.css';
 
-// Protected Route Component - Allows both authenticated and guest users
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
+// Simple Layout Component with navigation
+function AppLayout({ children }) {
   return (
     <div className="app-wrapper">
       <TopNavMenu />
@@ -35,94 +26,65 @@ function ProtectedRoute({ children }) {
   );
 }
 
-// Public Route Component (redirects to home if already logged in)
-function PublicRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-}
-
 // Main App Routes
 function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Pages - Public, no navigation */}
-      <Route 
-        path="/login" 
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        } 
-      />
-      <Route 
-        path="/signup" 
-        element={
-          <PublicRoute>
-            <SignupPage />
-          </PublicRoute>
-        } 
-      />
-      
-      {/* Main App Pages - Protected, with navigation */}
+      {/* All pages with navigation */}
       <Route 
         path="/" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <InsightsPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/check-in" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <CheckInPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/summary" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <SummaryPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/voice" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <VoicePage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/goals" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <GoalsPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/transactions" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <TransactionsPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
       <Route 
         path="/about" 
         element={
-          <ProtectedRoute>
+          <AppLayout>
             <AboutPage />
-          </ProtectedRoute>
+          </AppLayout>
         } 
       />
     </Routes>
@@ -131,13 +93,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <DataProvider>
-        <HashRouter>
-          <AppRoutes />
-        </HashRouter>
-      </DataProvider>
-    </AuthProvider>
+    <DataProvider>
+      <HashRouter>
+        <AppRoutes />
+      </HashRouter>
+    </DataProvider>
   );
 }
 
