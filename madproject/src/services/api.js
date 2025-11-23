@@ -28,6 +28,25 @@ export function setUser(user) {
 }
 
 /**
+ * Get bank transactions (includes income/deposits and expenses)
+ * @returns {Promise<Object>} Bank transactions data with user info and transactions array
+ */
+export async function getBankTransactions() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/transactions`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch bank transactions: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bank transactions:', error);
+    throw error;
+  }
+}
+
+/**
  * Parse a voice entry transcript using the backend AI
  * @param {string} transcript - The voice transcript to parse
  * @returns {Promise<Object>} Parsed entry data including amount, category, emotion, etc.
@@ -108,25 +127,6 @@ export async function matchTransaction(parsedEntry, transcript, entryTime = null
     return await response.json();
   } catch (error) {
     console.error('Error matching transaction:', error);
-    throw error;
-  }
-}
-
-/**
- * Get bank transactions from the backend
- * @returns {Promise<Object>} Bank transactions data
- */
-export async function getBankTransactions() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/transactions`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch transactions: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching bank transactions:', error);
     throw error;
   }
 }
@@ -395,6 +395,103 @@ export async function getImpulsivePurchases(userId = 'default') {
     };
   } catch (error) {
     console.error('Error fetching impulsive purchases:', error);
+    throw error;
+  }
+}
+
+// ============ GOALS API ============
+
+/**
+ * Get all goals for a user
+ * @param {string} userId - User ID
+ * @returns {Promise<Object>} Goals list
+ */
+export async function getGoals(userId = 'default') {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/goals?userId=${userId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch goals: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching goals:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new goal
+ * @param {Object} goalData - Goal data
+ * @returns {Promise<Object>} Created goal
+ */
+export async function createGoal(goalData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/goals`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(goalData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create goal: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating goal:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update a goal
+ * @param {string} goalId - Goal ID
+ * @param {Object} updates - Updates to apply
+ * @returns {Promise<Object>} Updated goal
+ */
+export async function updateGoal(goalId, updates) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update goal: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating goal:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a goal
+ * @param {string} goalId - Goal ID
+ * @returns {Promise<Object>} Delete confirmation
+ */
+export async function deleteGoal(goalId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/goals/${goalId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete goal: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting goal:', error);
     throw error;
   }
 }

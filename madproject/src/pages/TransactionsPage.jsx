@@ -207,8 +207,8 @@ function TransactionsPage() {
                       </div>
                     </div>
                     <div className="transaction-amount">
-                      <span className="amount-value negative">
-                        -${tx.amount.toFixed(2)}
+                      <span className={`amount-value ${tx.type === 'Credit' ? 'positive' : 'negative'}`}>
+                        {tx.type === 'Credit' ? '+' : '-'}${tx.amount.toFixed(2)}
                       </span>
                     </div>
                   </div>

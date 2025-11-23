@@ -1,11 +1,9 @@
 import { Container, Row, Col } from 'react-bootstrap';
 import WidgetCard from '../components/WidgetCard';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import './AboutPage.css';
 
 function AboutPage() {
-  const { isAuthenticated } = useAuth();
 
   return (
     <Container className="py-4 about-page">
@@ -72,20 +70,6 @@ function AboutPage() {
 
           <Col md={6} lg={4}>
             <WidgetCard 
-              title="🎤 Voice"
-              subtitle="Add context"
-              accent="success"
-              interactive={true}
-            >
-              <p className="feature-description muted-text">
-                Record voice memos to add context to your transactions and capture 
-                your emotional state at the moment of purchase.
-              </p>
-            </WidgetCard>
-          </Col>
-
-          <Col md={6} lg={4}>
-            <WidgetCard 
               title="🎯 Goals"
               subtitle="Set targets"
               accent="danger"
@@ -94,6 +78,20 @@ function AboutPage() {
               <p className="feature-description muted-text">
                 Set and track your financial goals while identifying emotional blockers 
                 that prevent you from achieving them.
+              </p>
+            </WidgetCard>
+          </Col>
+
+          <Col md={6} lg={4}>
+            <WidgetCard 
+              title="💳 Transactions"
+              subtitle="Track spending"
+              accent="primary"
+              interactive={true}
+            >
+              <p className="feature-description muted-text">
+                View all your bank transactions and see how income and expenses 
+                flow through your accounts.
               </p>
             </WidgetCard>
           </Col>
@@ -136,26 +134,24 @@ function AboutPage() {
         </Row>
       </div>
 
-      {!isAuthenticated && (
-        <div className="cta-section">
-          <WidgetCard accent="primary">
-            <div className="cta-content">
-              <h3 className="cta-title">Ready to get started?</h3>
-              <p className="cta-text muted-text">
-                Sign up for free and start understanding your emotional spending patterns today.
-              </p>
-              <div className="cta-buttons">
-                <Link to="/signup">
-                  <button className="btn-primary-custom">Get Started</button>
-                </Link>
-                <Link to="/login">
-                  <button className="btn-secondary-custom">Login</button>
-                </Link>
-              </div>
+      <div className="cta-section">
+        <WidgetCard accent="primary">
+          <div className="cta-content">
+            <h3 className="cta-title">Start Tracking Your Emotional Spending</h3>
+            <p className="cta-text muted-text">
+              Use Clarity to understand your emotional spending patterns and develop healthier financial habits.
+            </p>
+            <div className="cta-buttons">
+              <Link to="/check-in">
+                <button className="btn-primary-custom">Add Check-in</button>
+              </Link>
+              <Link to="/">
+                <button className="btn-secondary-custom">View Insights</button>
+              </Link>
             </div>
-          </WidgetCard>
-        </div>
-      )}
+          </div>
+        </WidgetCard>
+      </div>
     </Container>
   );
 }

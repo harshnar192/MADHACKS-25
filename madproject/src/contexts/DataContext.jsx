@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { getEmotionalTransactions } from '../services/api';
+import { getEmotionalTransactions, getBankTransactions } from '../services/api';
 
 const DataContext = createContext();
 
@@ -38,40 +38,68 @@ function getIconForMerchant(merchant, category = '') {
 export function DataProvider({ children }) {
   // Fetch from MongoDB instead of localStorage
   const [checkIns, setCheckIns] = useState([]);
+  const [bankTransactions, setBankTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch emotional transactions from MongoDB on mount
+  // Fetch emotional transactions and bank transactions on mount
   useEffect(() => {
     async function loadData() {
       try {
         setIsLoading(true);
-        console.log('Loading emotional transactions...');
-        const response = await getEmotionalTransactions('default', 100);
-        console.log('Received response:', response);
+        console.log('🔄 Loading emotional transactions and bank data...');
+        
+        // Fetch both emotional transactions and bank transactions in parallel
+        const [emotionalResponse, bankResponse] = await Promise.all([
+          getEmotionalTransactions('default', 100),
+          getBankTransactions()
+        ]);
+        
+        console.log('✅ Received emotional transactions:', emotionalResponse);
+        console.log('✅ Received bank transactions:', bankResponse);
+        
+        if (!emotionalResponse || !emotionalResponse.transactions) {
+          console.warn('⚠️ No emotional transactions in response:', emotionalResponse);
+        }
+        
+        if (!bankResponse || !bankResponse.transactions) {
+          console.warn('⚠️ No bank transactions in response:', bankResponse);
+        }
         
         // Transform MongoDB documents to the format expected by UI
-        const transformedData = (response.transactions || []).map(tx => ({
+        const transformedData = (emotionalResponse.transactions || []).map(tx => ({
           id: tx._id,
           label: tx.merchant || 'Unknown',
+          category: tx.category || 'other',
           amount: `$${Number(tx.amount || 0).toFixed(2)}`,
           note: tx.context || tx.transcript || '',
-          icon: getIconForMerchant(tx.merchant || ''),
+          icon: getIconForMerchant(tx.merchant || '', tx.category || ''),
           amountType: 'negative',
           emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
           amountValue: Number(tx.amount || 0),
           timestamp: tx.entry_time
         }));
 
-        console.log(`Loaded ${transformedData.length} emotional transactions`);
+        console.log(`✅ Transformed ${transformedData.length} emotional transactions`);
+        console.log('Sample transformed data:', transformedData.slice(0, 2));
         setCheckIns(transformedData);
+        
+        // Store bank transactions
+        const bankTxns = bankResponse.transactions || [];
+        setBankTransactions(bankTxns);
+        console.log(`✅ Loaded ${bankTxns.length} bank transactions`);
+        
         setError(null);
+        console.log('✅ Data loading complete!');
       } catch (err) {
-        console.error('Failed to load emotional transactions:', err);
+        console.error('❌ Failed to load data:', err);
+        console.error('Error stack:', err.stack);
         setError(err.message);
-        setCheckIns([]); // Empty state on error
+        setCheckIns([]);
+        setBankTransactions([]);
       } finally {
         setIsLoading(false);
+        console.log('🔚 Loading state set to false');
       }
     }
 
@@ -154,9 +182,18 @@ export function DataProvider({ children }) {
     ];
   }, [checkIns]);
 
-  // Calculate total emotional spending
+  // Calculate monthly income from bank transactions with type='Credit' (deposits/income)
+  const monthlyIncome = useMemo(() => {
+    return bankTransactions
+      .filter(tx => tx.type === 'Credit' || tx.category === 'income')
+      .reduce((sum, tx) => sum + (tx.amount || 0), 0);
+  }, [bankTransactions]);
+
+  // Calculate total emotional spending (excluding income)
   const emotionalSpending = useMemo(() => {
-    return checkIns.reduce((sum, checkIn) => sum + (checkIn.amountValue || 0), 0);
+    return checkIns
+      .filter(tx => tx.category !== 'income')
+      .reduce((sum, checkIn) => sum + (checkIn.amountValue || 0), 0);
   }, [checkIns]);
 
   // Calculate spending by mood (for bar chart)
@@ -227,21 +264,30 @@ export function DataProvider({ children }) {
   // Refresh data from MongoDB (call this after saving a new transaction)
   const refreshData = async () => {
     try {
-      const response = await getEmotionalTransactions('default', 100);
-      const transformedData = (response.transactions || []).map(tx => ({
+      console.log('🔄 Refreshing data...');
+      const [emotionalResponse, bankResponse] = await Promise.all([
+        getEmotionalTransactions('default', 100),
+        getBankTransactions()
+      ]);
+      
+      const transformedData = (emotionalResponse.transactions || []).map(tx => ({
         id: tx._id,
         label: tx.merchant || 'Unknown',
+        category: tx.category || 'other',
         amount: `$${Number(tx.amount || 0).toFixed(2)}`,
         note: tx.context || tx.transcript || '',
-        icon: getIconForMerchant(tx.merchant || ''),
+        icon: getIconForMerchant(tx.merchant || '', tx.category || ''),
         amountType: 'negative',
         emotion: tx.emotion ? (tx.emotion.charAt(0).toUpperCase() + tx.emotion.slice(1)) : 'Stress',
         amountValue: Number(tx.amount || 0),
         timestamp: tx.entry_time
       }));
+      
       setCheckIns(transformedData);
+      setBankTransactions(bankResponse.transactions || []);
+      console.log('✅ Data refreshed successfully');
     } catch (err) {
-      console.error('Failed to refresh data:', err);
+      console.error('❌ Failed to refresh data:', err);
     }
   };
 
@@ -256,16 +302,24 @@ export function DataProvider({ children }) {
     }));
   }, [checkIns]);
 
-  // Calculate spending by category from checkIns
+  // Calculate spending by category from checkIns (excluding income)
   const spendingByCategory = useMemo(() => {
     const categories = {};
-    checkIns.forEach(checkIn => {
-      const category = checkIn.label || 'Other';
-      if (!categories[category]) {
-        categories[category] = 0;
-      }
-      categories[category] += checkIn.amountValue || 0;
-    });
+    checkIns
+      .filter(checkIn => checkIn.category !== 'income') // Exclude income transactions
+      .forEach(checkIn => {
+        // Use category field, format it nicely
+        const category = checkIn.category || 'other';
+        const formattedCategory = category
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+        
+        if (!categories[formattedCategory]) {
+          categories[formattedCategory] = 0;
+        }
+        categories[formattedCategory] += checkIn.amountValue || 0;
+      });
 
     const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
     return Object.entries(categories).map(([category, amount]) => ({
@@ -334,7 +388,10 @@ export function DataProvider({ children }) {
     moodBreakdown,
     spendingByMood,
     spendingByCategoryMood,
-    weeklySummary
+    weeklySummary,
+    
+    // Income tracking
+    monthlyIncome
   };
 
   return (

@@ -3,7 +3,7 @@ import { DataProvider } from './contexts/DataContext';
 import InsightsPage from './pages/InsightsPage';
 import CheckInPage from './pages/CheckInPage';
 import SummaryPage from './pages/SummaryPage';
-import VoicePage from './pages/VoicePage';
+// import VoicePage from './pages/VoicePage'; // Redundant - CheckInPage handles voice input
 import GoalsPage from './pages/GoalsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import AboutPage from './pages/AboutPage';
@@ -55,14 +55,15 @@ function AppRoutes() {
           </AppLayout>
         } 
       />
-      <Route 
+      {/* Commented out - VoicePage is redundant, CheckInPage handles voice input */}
+      {/* <Route 
         path="/voice" 
         element={
           <AppLayout>
             <VoicePage />
           </AppLayout>
         } 
-      />
+      /> */}
       <Route 
         path="/goals" 
         element={

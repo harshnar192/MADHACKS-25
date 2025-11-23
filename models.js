@@ -69,20 +69,20 @@ const goalSchema = new mongoose.Schema({
     required: true,
     default: 'default',
   },
-  type: {
+  title: {
     type: String,
-    enum: ['spending_limit', 'savings_target'],
     required: true,
   },
-  category: String,
   target_amount: {
     type: Number,
     required: true,
   },
-  timeframe: {
-    type: String,
-    enum: ['daily', 'weekly', 'monthly'],
-    required: true,
+  current_amount: {
+    type: Number,
+    default: 0,
+  },
+  deadline: {
+    type: Date,
   },
   description: String,
   created_at: {

@@ -9,6 +9,28 @@
   },
   "transactions": [
     {
+      "id": 0,
+      "transaction_id": "TXN20250201001",
+      "amount": 3000,
+      "merchant": "Direct Deposit - Employer",
+      "category": "income",
+      "date": "2025-02-01",
+      "time": "00:01:00",
+      "datetime": "2025-02-01T00:01:00",
+      "day_of_week": "Saturday",
+      "description": "PAYROLL DEPOSIT",
+      "location": {
+        "city": "San Francisco",
+        "state": "CA",
+        "zip": "94102"
+      },
+      "payment_method": "Direct Deposit",
+      "status": "Completed",
+      "type": "Credit",
+      "authorization_code": "DEP001",
+      "balance_after": -1432.56
+    },
+    {
       "id": 1,
       "transaction_id": "TXN20250201156",
       "amount": 70.04,

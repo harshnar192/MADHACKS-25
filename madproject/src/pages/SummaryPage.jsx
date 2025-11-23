@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import InsightCard from '../components/InsightCard';
 import { useData } from '../contexts/DataContext';
-import { generateSummary } from '../services/api';
+import { generateSummary, getGoals } from '../services/api';
 import './SummaryPage.css';
 
 function SummaryPage() {
@@ -12,6 +12,20 @@ function SummaryPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [selectedPersona, setSelectedPersona] = useState('supportive_friend');
+  const [goals, setGoals] = useState([]);
+
+  // Fetch real goals from database
+  useEffect(() => {
+    async function loadGoals() {
+      try {
+        const response = await getGoals('default');
+        setGoals(response.goals || []);
+      } catch (error) {
+        console.error('Failed to load goals:', error);
+      }
+    }
+    loadGoals();
+  }, []);
   
   // Helper to convert trigger name back to mood format
   const getMoodFromTrigger = (trigger) => {
@@ -34,43 +48,70 @@ function SummaryPage() {
     setError(null);
 
     try {
-      // Prepare data for the backend using real impulsive purchase data
+      // Prepare data for the backend using REAL data from context
       const totalSpending = emotionalSpending || totalSpent || 0;
       const categoryData = spendingByCategory.reduce((acc, item) => {
         acc[item.category.toLowerCase().replace(' ', '_')] = item.amount;
         return acc;
       }, {});
       
+      // Build real voice entries from checkIns
+      const voiceEntries = checkIns.slice(0, 10).map(tx => ({
+        raw_transcript: tx.note || tx.context || `Spent $${tx.amountValue} at ${tx.label}`,
+        parsed: {
+          amount: tx.amountValue,
+          merchant: tx.label,
+          category: tx.category,
+          emotion: tx.emotion ? tx.emotion.toLowerCase() : 'neutral'
+        }
+      }));
+
+      // Calculate real emotional spending patterns
+      const emotionSpending = {};
+      checkIns.forEach(tx => {
+        const emotion = (tx.emotion || 'neutral').toLowerCase();
+        if (!emotionSpending[emotion]) {
+          emotionSpending[emotion] = { count: 0, total: 0 };
+        }
+        emotionSpending[emotion].count++;
+        emotionSpending[emotion].total += tx.amountValue || 0;
+      });
+
+      const patterns = Object.keys(emotionSpending).reduce((acc, emotion, idx) => {
+        acc[`pattern_${idx}`] = {
+          pattern: `${emotion} spending`,
+          occurrences: emotionSpending[emotion].count,
+          total_cost: emotionSpending[emotion].total
+        };
+        return acc;
+      }, {});
+      
       const data = {
-        goals: [
-          { description: "Keep food delivery under $75/week" },
-          { description: "Limit bar spending to $100/week" }
-        ],
+        goals: goals.map(g => ({
+          description: `${g.title}: Save $${g.target_amount} by ${new Date(g.deadline).toLocaleDateString()}`
+        })),
         spending: {
           total_spent: totalSpending,
           by_category: categoryData
         },
         goalProgress: spendingByCategory.reduce((acc, item) => {
+          // Find matching goal for category (if any)
+          const relevantGoal = goals.find(g => 
+            g.title.toLowerCase().includes(item.category.toLowerCase())
+          );
           acc[item.category.toLowerCase().replace(' ', '_')] = {
-            goal: 500,
+            goal: relevantGoal ? relevantGoal.target_amount : item.amount * 1.5,
             actual: item.amount,
             percent: item.percentage
           };
           return acc;
         }, {}),
-        voiceEntries: [],
+        voiceEntries,
         invisibleSpending: {
           unlogged_transactions: checkIns.filter(tx => (tx.amountValue || 0) < 50).length,
           unlogged_amount: checkIns.filter(tx => (tx.amountValue || 0) < 50).reduce((sum, tx) => sum + (tx.amountValue || 0), 0)
         },
-        patterns: emotionalTriggers.reduce((acc, trigger, idx) => {
-          acc[`pattern_${idx}`] = {
-            pattern: trigger.trigger,
-            occurrences: trigger.count,
-            total_cost: (emotionalSpending || 0) * (trigger.count / (checkIns.length || 1)) || 50 * trigger.count
-          };
-          return acc;
-        }, {})
+        patterns
       };
 
       const result = await generateSummary(selectedPersona, data);
@@ -88,7 +129,8 @@ function SummaryPage() {
     emotionalTriggers, 
     checkIns,
     isLoading,
-    emotionalSpending
+    emotionalSpending,
+    monthlyIncome
   } = useData();
   
   // Calculate weekly insight based on data

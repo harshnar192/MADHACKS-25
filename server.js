@@ -258,12 +258,18 @@ app.get("/api/transactions", (req, res) => {
 app.post("/api/emotional-transactions", async (req, res) => {
   try {
     const {
-      userId = 'default',
-      transactionId,
-      matchedTransaction,
-      matchConfidence,
-      needsCorrection,
-      userConfirmed,
+      user_id = 'default',
+      userId = user_id,
+      transaction_id,
+      transactionId = transaction_id,
+      matched_transaction,
+      matchedTransaction = matched_transaction,
+      match_confidence,
+      matchConfidence = match_confidence,
+      needs_correction,
+      needsCorrection = needs_correction,
+      user_confirmed,
+      userConfirmed = user_confirmed,
       amount,
       merchant,
       category,
@@ -579,6 +585,115 @@ app.get("/api/auth/verify", verifyToken, (req, res) => {
       name: user.name
     }
   });
+});
+
+// ============ GOALS ENDPOINTS ============
+
+// Get goals for a user
+app.get("/api/goals", async (req, res) => {
+  try {
+    const userId = req.query.userId || 'default';
+    
+    const goals = await Goal.find({ user_id: userId }).sort({ created_at: -1 });
+    
+    res.json({
+      success: true,
+      count: goals.length,
+      goals,
+    });
+  } catch (error) {
+    console.error('Error fetching goals:', error);
+    res.status(500).json({
+      error: error.message,
+      details: 'Failed to fetch goals',
+    });
+  }
+});
+
+// Create a new goal
+app.post("/api/goals", async (req, res) => {
+  try {
+    const {
+      user_id = 'default',
+      type,
+      category,
+      target_amount,
+      timeframe,
+      description,
+    } = req.body;
+
+    const goal = new Goal({
+      user_id,
+      type,
+      category,
+      target_amount,
+      timeframe,
+      description,
+    });
+
+    await goal.save();
+    console.log(`✅ Created goal: ${type} - $${target_amount}/${timeframe}`);
+
+    res.json({
+      success: true,
+      goal,
+    });
+  } catch (error) {
+    console.error('Error creating goal:', error);
+    res.status(500).json({
+      error: error.message,
+      details: 'Failed to create goal',
+    });
+  }
+});
+
+// Update a goal
+app.patch("/api/goals/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const goal = await Goal.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!goal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({
+      success: true,
+      goal,
+    });
+  } catch (error) {
+    console.error('Error updating goal:', error);
+    res.status(500).json({
+      error: error.message,
+      details: 'Failed to update goal',
+    });
+  }
+});
+
+// Delete a goal
+app.delete("/api/goals/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const goal = await Goal.findByIdAndDelete(id);
+
+    if (!goal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Goal deleted',
+    });
+  } catch (error) {
+    console.error('Error deleting goal:', error);
+    res.status(500).json({
+      error: error.message,
+      details: 'Failed to delete goal',
+    });
+  }
 });
 
 // Health check
