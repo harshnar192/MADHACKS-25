@@ -1,0 +1,185 @@
+{
+  "user": {
+    "id": "user_001",
+    "name": "Alex Chen",
+    "persona_preference": "stern_coach"
+  },
+  "transactions": [
+    {
+      "id": "tx_001",
+      "amount": 47.23,
+      "merchant": "Uber Eats",
+      "category": "food_delivery",
+      "date": "2025-01-20T20:34:00",
+      "day_of_week": "Monday"
+    },
+    {
+      "id": "tx_002",
+      "amount": 5.75,
+      "merchant": "Starbucks",
+      "category": "coffee",
+      "date": "2025-01-20T08:12:00",
+      "day_of_week": "Monday"
+    },
+    {
+      "id": "tx_003",
+      "amount": 3.50,
+      "merchant": "Office Vending Machine",
+      "category": "snacks",
+      "date": "2025-01-20T14:22:00",
+      "day_of_week": "Monday"
+    },
+    {
+      "id": "tx_004",
+      "amount": 52.10,
+      "merchant": "DoorDash",
+      "category": "food_delivery",
+      "date": "2025-01-21T19:45:00",
+      "day_of_week": "Tuesday"
+    },
+    {
+      "id": "tx_005",
+      "amount": 6.25,
+      "merchant": "Starbucks",
+      "category": "coffee",
+      "date": "2025-01-21T08:30:00",
+      "day_of_week": "Tuesday"
+    },
+    {
+      "id": "tx_006",
+      "amount": 85.00,
+      "merchant": "The Tipsy Crow Bar",
+      "category": "alcohol",
+      "date": "2025-01-21T22:15:00",
+      "day_of_week": "Tuesday"
+    },
+    {
+      "id": "tx_007",
+      "amount": 156.32,
+      "merchant": "Target",
+      "category": "shopping",
+      "date": "2025-01-22T15:00:00",
+      "day_of_week": "Wednesday"
+    },
+    {
+      "id": "tx_008",
+      "amount": 4.25,
+      "merchant": "7-Eleven",
+      "category": "snacks",
+      "date": "2025-01-22T16:45:00",
+      "day_of_week": "Wednesday"
+    },
+    {
+      "id": "tx_009",
+      "amount": 15.99,
+      "merchant": "Netflix",
+      "category": "subscriptions",
+      "date": "2025-01-22T00:00:00",
+      "day_of_week": "Wednesday"
+    },
+    {
+      "id": "tx_010",
+      "amount": 38.50,
+      "merchant": "Chipotle",
+      "category": "dining_out",
+      "date": "2025-01-23T12:30:00",
+      "day_of_week": "Thursday"
+    },
+    {
+      "id": "tx_011",
+      "amount": 5.50,
+      "merchant": "Starbucks",
+      "category": "coffee",
+      "date": "2025-01-23T07:45:00",
+      "day_of_week": "Thursday"
+    },
+    {
+      "id": "tx_012",
+      "amount": 24.00,
+      "merchant": "Uber",
+      "category": "transport",
+      "date": "2025-01-23T23:10:00",
+      "day_of_week": "Thursday"
+    },
+    {
+      "id": "tx_013",
+      "amount": 87.42,
+      "merchant": "Whole Foods",
+      "category": "groceries",
+      "date": "2025-01-24T11:00:00",
+      "day_of_week": "Friday"
+    },
+    {
+      "id": "tx_014",
+      "amount": 62.00,
+      "merchant": "Happy Hour Lounge",
+      "category": "alcohol",
+      "date": "2025-01-24T18:30:00",
+      "day_of_week": "Friday"
+    },
+    {
+      "id": "tx_015",
+      "amount": 11.99,
+      "merchant": "Spotify",
+      "category": "subscriptions",
+      "date": "2025-01-24T00:00:00",
+      "day_of_week": "Friday"
+    },
+    {
+      "id": "tx_016",
+      "amount": 41.20,
+      "merchant": "Grubhub",
+      "category": "food_delivery",
+      "date": "2025-01-25T20:15:00",
+      "day_of_week": "Saturday"
+    },
+    {
+      "id": "tx_017",
+      "amount": 3.25,
+      "merchant": "Gas Station",
+      "category": "snacks",
+      "date": "2025-01-25T15:30:00",
+      "day_of_week": "Saturday"
+    },
+    {
+      "id": "tx_018",
+      "amount": 125.00,
+      "merchant": "Electric Company",
+      "category": "bills",
+      "date": "2025-01-25T00:00:00",
+      "day_of_week": "Saturday"
+    },
+    {
+      "id": "tx_019",
+      "amount": 78.00,
+      "merchant": "Rooftop Bar",
+      "category": "alcohol",
+      "date": "2025-01-26T21:00:00",
+      "day_of_week": "Sunday"
+    },
+    {
+      "id": "tx_020",
+      "amount": 5.00,
+      "merchant": "Local Coffee Shop",
+      "category": "coffee",
+      "date": "2025-01-26T09:30:00",
+      "day_of_week": "Sunday"
+    },
+    {
+      "id": "tx_021",
+      "amount": 34.99,
+      "merchant": "Amazon",
+      "category": "shopping",
+      "date": "2025-01-26T14:00:00",
+      "day_of_week": "Sunday"
+    },
+    {
+      "id": "tx_022",
+      "amount": 2.99,
+      "merchant": "Convenience Store",
+      "category": "snacks",
+      "date": "2025-01-26T17:20:00",
+      "day_of_week": "Sunday"
+    }
+  ]
+}

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Container, Modal, Form, Button, Row } from 'react-bootstrap';
+import { Container, Modal, Form, Button, Row, Alert } from 'react-bootstrap';
 import InsightCard from '../components/InsightCard';
 import TransactionList from '../components/TransactionList';
 import { useVoiceRecorder } from '../hooks/useVoiceRecorder';
 import { useData } from '../contexts/DataContext';
+import { parseEntry, transcribeAudio } from '../services/api';
 import './CheckInPage.css';
 
 function CheckInPage() {
@@ -14,6 +15,9 @@ function CheckInPage() {
     merchant: '',
     explanation: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Voice recording hook
   const {
@@ -42,13 +46,75 @@ function CheckInPage() {
     if (isRecording) {
       stopRecording();
     } else {
-      // Don't clear here - let startRecording handle resetting the timer
       startRecording();
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleVoiceSubmit = async () => {
+    if (!audioBlob) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Transcribe the audio using Fish Audio
+      console.log('🎤 Transcribing audio...');
+      const transcript = await transcribeAudio(audioBlob, recordingTime);
+      console.log('✅ Transcription:', transcript);
+      
+      // Parse the transcribed text
+      console.log('🤖 Parsing with AI...');
+      const parsedResult = await parseEntry(transcript);
+      console.log('✅ Parsed result:', parsedResult);
+      
+      // Show success and clear recording
+      setSubmitSuccess(true);
+      clearRecording();
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to process voice recording:', error);
+      setSubmitError(error.message || 'Failed to process your voice recording. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      // Create a transcript from the form data
+      const transcript = `Spent ${formData.amount} at ${formData.merchant}. ${formData.explanation}`;
+      
+      // Parse the entry using the backend API
+      const parsedResult = await parseEntry(transcript);
+      console.log('Parsed entry:', parsedResult);
+
+      // TODO: Save the parsed entry to a database or state management
+      setSubmitSuccess(true);
+      handleCloseModal();
+      
+      // Reset form after successful submission
+      setTimeout(() => {
+        setFormData({
+          amount: '',
+          merchant: '',
+          explanation: ''
+        });
+        setSubmitSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Failed to submit check-in:', error);
+      setSubmitError('Failed to process your check-in. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
     // Add check-in to global state
     addCheckIn(formData);
     handleCloseModal();
@@ -66,6 +132,18 @@ function CheckInPage() {
         <h2 className="text-primary mb-2">Check-in</h2>
         <p className="muted-text">Log how you're feeling and track your spending decisions.</p>
       </div>
+
+      {/* Success/Error Messages */}
+      {submitSuccess && (
+        <Alert variant="success" onClose={() => setSubmitSuccess(false)} dismissible>
+          Check-in submitted successfully!
+        </Alert>
+      )}
+      {submitError && (
+        <Alert variant="danger" onClose={() => setSubmitError(null)} dismissible>
+          {submitError}
+        </Alert>
+      )}
 
       {/* Top Card: Unexpected Spending */}
       <Row className="mb-4">
@@ -116,10 +194,19 @@ function CheckInPage() {
                       <span className="success-icon">✅</span>
                       <span>Recording complete! ({recordingTime}, {Math.round(audioBlob.size / 1024)} KB)</span>
                       <Button 
+                        className="btn-primary-custom"
+                        onClick={handleVoiceSubmit}
+                        size="sm"
+                        style={{ marginLeft: '12px' }}
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? 'Processing...' : 'Submit Voice'}
+                      </Button>
+                      <Button 
                         className="btn-secondary-custom"
                         onClick={clearRecording}
                         size="sm"
-                        style={{ marginLeft: '12px' }}
+                        style={{ marginLeft: '8px' }}
                       >
                         Clear
                       </Button>

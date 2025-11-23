@@ -1,0 +1,88 @@
+{
+  "user_id": "user_001",
+  "week": "2025-01-20 to 2025-01-26",
+  
+  "spending_summary": {
+    "total_spent": 976.24,
+    "by_category": {
+      "food_delivery": 140.53,
+      "coffee": 22.50,
+      "snacks": 13.99,
+      "alcohol": 225.00,
+      "shopping": 191.31,
+      "dining_out": 38.50,
+      "groceries": 87.42,
+      "transport": 24.00,
+      "subscriptions": 27.98,
+      "bills": 125.00
+    }
+  },
+
+  "goal_progress": {
+    "food_delivery": {
+      "goal": 75.00,
+      "actual": 140.53,
+      "status": "exceeded",
+      "percent": 187
+    },
+    "alcohol": {
+      "goal": 100.00,
+      "actual": 225.00,
+      "status": "exceeded",
+      "percent": 225
+    },
+    "coffee": {
+      "goal": 25.00,
+      "actual": 22.50,
+      "status": "on_track",
+      "percent": 90
+    }
+  },
+
+  "invisible_spending": {
+    "description": "Transactions with no voice entry logged",
+    "transactions": [
+      {"id": "tx_002", "merchant": "Starbucks", "amount": 5.75, "category": "coffee"},
+      {"id": "tx_003", "merchant": "Office Vending Machine", "amount": 3.50, "category": "snacks"},
+      {"id": "tx_005", "merchant": "Starbucks", "amount": 6.25, "category": "coffee"},
+      {"id": "tx_008", "merchant": "7-Eleven", "amount": 4.25, "category": "snacks"},
+      {"id": "tx_009", "merchant": "Netflix", "amount": 15.99, "category": "subscriptions"},
+      {"id": "tx_010", "merchant": "Chipotle", "amount": 38.50, "category": "dining_out"},
+      {"id": "tx_011", "merchant": "Starbucks", "amount": 5.50, "category": "coffee"},
+      {"id": "tx_012", "merchant": "Uber", "amount": 24.00, "category": "transport"},
+      {"id": "tx_015", "merchant": "Spotify", "amount": 11.99, "category": "subscriptions"},
+      {"id": "tx_017", "merchant": "Gas Station", "amount": 3.25, "category": "snacks"},
+      {"id": "tx_018", "merchant": "Electric Company", "amount": 125.00, "category": "bills"},
+      {"id": "tx_020", "merchant": "Local Coffee Shop", "amount": 5.00, "category": "coffee"},
+      {"id": "tx_021", "merchant": "Amazon", "amount": 34.99, "category": "shopping"},
+      {"id": "tx_022", "merchant": "Convenience Store", "amount": 2.99, "category": "snacks"}
+    ],
+    "total_unlogged": 286.96,
+    "insight": "14 of 22 transactions (64%) were never logged. That's $287 in 'invisible' spending you're not tracking."
+  },
+
+  "emotional_patterns": {
+    "stress_spending": {
+      "pattern": "When you mention feeling 'stressed' or 'tired', food delivery follows within 2 hours",
+      "occurrences": 3,
+      "total_cost": 140.53
+    },
+    "peer_pressure": {
+      "pattern": "Alcohol spending correlates with mentions of 'coworkers' or 'couldn't say no'",
+      "occurrences": 2,
+      "total_cost": 147.00
+    },
+    "weekend_pattern": {
+      "pattern": "Weekend spending includes regret-tagged purchases",
+      "insight": "Saturday and Sunday had the most self-critical entries"
+    }
+  },
+
+  "sample_summaries": {
+    "supportive_friend": "Hey! So this week you spent about $976 total. I know that sounds like a lot, but let's break it down. Your groceries and bills are totally normal. The coffee? Actually under budget - nice job! Here's what I noticed though: when you mentioned being stressed or tired, delivery orders happened pretty quick after. Three times this week. Maybe keep some frozen meals ready for those rough days? Also, you're being really honest about the bar spending - that self-awareness is actually huge. You've got this.",
+    
+    "stern_coach": "Let's talk numbers. You spent $976 this week. Your food delivery goal was $75 - you hit $140. That's almost double. Alcohol budget was $100 - you spent $225. More than double. Three bar nights, three regret entries. You see the pattern, you even said 'this is becoming a problem.' So what are you going to do about it? Here's the real issue: 14 transactions, almost $300, you didn't even log. You can't fix what you don't track. Next week, log everything. No excuses.",
+    
+    "neutral_advisor": "Weekly spending summary: $976.24 total across 22 transactions. Category breakdown: Alcohol leads at $225, followed by shopping at $191, then food delivery at $141. Goal performance: Coffee is at 90% of limit, food delivery at 187%, alcohol at 225%. Pattern analysis: 64% of transactions were unlogged, totaling $287. Emotional correlation detected between stress-tagged entries and food delivery within 2-hour windows, occurring 3 times. Recommendation: Implement logging prompts for small purchases under $10."
+  }
+}
